@@ -1,9 +1,7 @@
 import * as axios from 'axios';
 
 const instance = axios.create({
-    baseUrl: '',
     withCredentials: true,
-    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjkzMCwiaWF0IjoxNjU5Nzg1ODI5MDc1LCJzdWIiOiJBUElfQVVUSE9SSVpBVElPTl9UT0tFTiJ9.7YHyO3AUwfCHnmUsU8Qg3BWboJ_dNIKvBodr-qk2e4A",
 
 })
 
