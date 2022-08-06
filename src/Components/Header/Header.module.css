@@ -1,0 +1,18 @@
+.header{
+    display: flex;
+    justify-content: space-between;
+    background-color: black;
+    height: 75px;
+}
+.logo{
+    height: 41px;
+    float: left;
+    margin-left: 160px;
+    margin-top: 17px; 
+}
+.likes{
+    width: 17px;
+}
+.box{
+    width: 17px;
+}

@@ -11,3 +11,68 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+ul{
+  padding-inline-start: 0px;
+
+}
+
+.header__buttons{
+  display: flex;
+  gap: 25px;
+  align-items: center;
+}
+
+.header__login{
+  color: #fff;
+}
+
+.main__goods{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.main__good{
+  position: relative;
+}
+
+.like__button{
+  position: absolute;
+  left: 140px;
+  bottom: 100px;
+  display: flex;
+  align-self: end;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.like__button_active svg{
+  fill: red;
+}
+
+.main__photo{
+  width: 200px;
+  height: 150px;
+}
+
+.main__list{
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+}
+
+.load_more{
+  margin: 0 auto;
+}
+
+.footer{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #F1F1F3;
+  height: 75px;
+}
