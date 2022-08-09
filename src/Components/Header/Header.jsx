@@ -15,7 +15,7 @@ const Header = () => {
                 <NavLink to="/box"><img className={s.box} src={basket} /></NavLink>
             </div>
             <div className='header__login'>
-                <h2>Register || <NavLink to="/login">Log In</NavLink></h2>
+                <h2><NavLink to="/register">Register</NavLink> || <NavLink to="/login">Log In</NavLink></h2>
             </div>
         </div>
     )

@@ -6,11 +6,16 @@ const GOODS = 'GOODS'
 const SEARCH_TEXT = 'SEARCH_TEXT'
 const SEARCHED_GOODS = 'SEARCHED_GOODS'
 const LIKE = 'LIKE'
-const DISLIKE = 'DISLIKE'
+const DISLIKE = 'DISLIKE';
+const SET_CATEGORIES = "SET_CATEGORIES";
+const SET_CURRENT_CATEGORY = "SET_CURRENT_CATEGORY"
 
 const initialState={
     goods: [],
     searchText: '',
+    categories: [],
+    sortedBy: "",
+    currentCategory: null
 }
 
 export const goodsReducer=(state = initialState, action)=>{
@@ -18,17 +23,17 @@ export const goodsReducer=(state = initialState, action)=>{
         case LIKE:
             return {
                 ...state,
-                users: updateObjectInArray(state.users, action.userId, 'id', {followed: true})
+                goods: updateObjectInArray(state.goods, action.itemId, 'id', {favorite: true})
             }
         case DISLIKE:
             return {
                 ...state,
-                users: updateObjectInArray(state.users, action.userId, 'id', {followed: false})
+                goods: updateObjectInArray(state.goods, action.itemId, 'id', {favorite: false})
             }
         case GOODS:
         return{
             ...state,
-            goods: action.goods
+            goods: action.goods,
         }
         case SEARCHED_GOODS:{
             return{
@@ -42,21 +47,50 @@ export const goodsReducer=(state = initialState, action)=>{
                 searchText: action.text
             }
         }
+        case SET_CATEGORIES:{
+            return{
+                ...state,
+                categories: action.category
+            }
+        }
+        case SET_CURRENT_CATEGORY:{
+            return{
+                ...state,
+                sortedBy: action.sort
+            }
+        }
         default: 
             return state
 
     }
 }
 
-const goodsAc=(goods)=>({type: GOODS, goods});
+const setGoods=(goods)=>({type: GOODS, goods});
+const setCategories=(category)=>({type: SET_CATEGORIES, category});
+export const setCurrentSort=(sort)=>({type: SET_CURRENT_CATEGORY, sort});
 export const likeSuccess = (itemId) => ({ type: LIKE, itemId })
 export const dislikeSuccess = (itemId) => ({ type: DISLIKE, itemId })
 const searchedGoods=(goods)=>({type: SEARCHED_GOODS, goods})
 export const searchTextAC=(text)=>({type: SEARCH_TEXT, text})
 
-export const getGoods=()=>async(dispatch)=>{
-    const responce = await ProductsApi.ShoesApi();
-    dispatch(goodsAc(responce.data))
+export const getGoods=(sort)=>async(dispatch)=>{
+    const responce = await SearchApi.startProducts(sort);
+    dispatch(setGoods(responce.data))
+}
+
+export const getCategories=()=>async(dispatch)=>{
+    const responce = await SearchApi.getCategories();
+    dispatch(setCategories(responce.data))
+}
+
+export const getChoosedCategoryProducts=(id, sort)=>async(dispatch)=>{
+    const responce = await SearchApi.getChoosedCategory(id, sort);
+    dispatch(setGoods(responce.data))
+}
+
+export const getFavoriteGoods=()=>async(dispatch)=>{
+    const responce = await ProductsApi.favoritsGoods();
+    dispatch(setGoods(responce.data))
 }
 
 export const getSearchedGoods=(text)=>async(dispatch)=>{
@@ -74,7 +108,7 @@ const likeDislikeFlow = async(dispatch, itemId, apiMethod, actionCreator)=>{
 }
 
 export const like = (itemId) => async(dispatch) => {
-    likeDislikeFlow(dispatch, itemId, ProductsApi.like.bind(ProductsApi), likeSuccess);
+    likeDislikeFlow(dispatch, itemId, ProductsApi.like, likeSuccess);
 }
 
 export const dislike = (itemId) => async(dispatch) => {

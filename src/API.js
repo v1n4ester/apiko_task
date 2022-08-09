@@ -1,34 +1,24 @@
 import * as axios from 'axios';
-
+// const TOKEN= localStorage.getItem("access_token");
+const TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjkzMiwiaWF0IjoxNjU5NzIwNTExNzU5LCJzdWIiOiJBUElfQVVUSE9SSVpBVElPTl9UT0tFTiJ9.IFE2gc9zvDaayJHP40h9gYWx9stZ3HgPSnxVBoY5Ls8"
 const instance = axios.create({
-    withCredentials: true,
-
-})
+    headers:{
+    'accept': 'application/json',
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${TOKEN}`
+    }
+    
+});
 
 export const ProductsApi={
-    ShoesApi(){
-        return instance.get('api/categories/1/products?limit=12');
-    },
-    Postfavorite(id){
-        return instance.post(`api/products/${id}/favorite`);
+    favoritsGoods(){
+        return instance.get('api/products/favorites');
     },
     like(itemId) {
-        return axios.get(`api/products/favorites`).then(response => {
-            const data = response.data;
-            data.followed = true;
-            axios.post(`api/products/${itemId}/favorite`, { data }, {
-                withCredentials: true
-            })
-        });
+        return instance.post(`api/products/${itemId}/favorite`)
     },
     dislike(itemId) {
-        return axios.get(`api/products/favorites`).then(response => {
-            const data = response.data;
-            data.followed = false;
-            axios.delete(`api/products/${itemId}/favorite`, {
-                withCredentials: true
-            })
-        });
+        return instance.delete(`api/products/${itemId}/favorite`)
     },
 
 }
@@ -36,24 +26,29 @@ export const ProductsApi={
 export const SearchApi={
     searchText(text){
         return axios.get(`api/products/search?keywords=${text}&limit=12`);
-    }
+    },
+    startProducts(sortedBy){
+        return instance.get(`api/products?limit=12&sortBy=${sortedBy || "latest"}`);
+    },
+    getCategories(){
+        return instance.get(`api/categories`);
+    },
+    getChoosedCategory(id, sortedBy){
+        return instance.get(`api/categories/${id}/products?sortBy=${sortedBy || "latest"}`);
+    },
 }
 
 export const authApi = {
     me(){
-        return instance.get(`https://api.themoviedb.org/3/movie/20712?api_key=a55864d714e04810728080950a4fd47a`, {
-            wthCredentials: true,
-            token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjkzMCwiaWF0IjoxNjU5Nzc0NTkzMzM2LCJzdWIiOiJBUElfQVVUSE9SSVpBVElPTl9UT0tFTiJ9.IR785RQSDjO-Zui5d-KnOBCBmTFBxnUOi1hH2SwJfSk"
-        })
+        return instance.get(`/api/account`)
+    },
+    register(fullName, email, password, phone){
+        return instance.post(`/api/auth/register`,{fullName, email, password, phone})
     },
     login(email, password){
-        console.log(email, password)
         return instance.post(`/api/auth/login`,{ email, password})
     },
-    getAcc(){
-        return instance.get(`/api/account`)
+    logOut(){
+        return instance.delete(`https://jsonplaceholder.typicode.com/users/11`)
     }
-    // logOut(){
-    //     return instance.delete(`https://jsonplaceholder.typicode.com/users/11`)
-    // }
 } 

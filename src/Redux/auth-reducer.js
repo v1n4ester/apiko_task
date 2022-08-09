@@ -1,15 +1,14 @@
-import { authApi, securityApi } from "../API";
+import { authApi } from "../API";
 
 
 const SET_USER_DATA = 'auth/SET_USER_DATA';
-const GET_CAPTCHA_URL_SUCCESS = 'auth/GET_CAPTCHA_URL_SUCCESS';
 
 let initialState = {
-    userId: null,
+    id: null,
     email: null,
-    login: null,
     isAuth: false,
     fullName: '',
+    phone: ''
 };
 
 const authReducer = (state = initialState, action) => {
@@ -19,6 +18,7 @@ const authReducer = (state = initialState, action) => {
             return {
                 ...state,
                 ...action.payload,
+                isAuth: true
                 }
     
         default:
@@ -27,37 +27,40 @@ const authReducer = (state = initialState, action) => {
 }
 
 
-export const setAuthUserData = (fullName) => ({ type: SET_USER_DATA , payload: {fullName}})
+export const setAuthUserData = (fullName, phone, email, id) => ({ type: SET_USER_DATA , payload: {fullName, phone, email, id}})
 
-// export const getAuthUserData = () => (dispatch) =>{
-//     return authApi.me().then(response => {
-//         const data = response.data;
-//             data.data = {}
-//             data.data.userId = 2;
-//             data.data.email = 'blabla@bla.com';
-//             data.data.login = 'free';
-//             data.data.isAuth = true
-//         if(response.status == 200){
-//             // success
-//             let{userId, login, email, isAuth} = data.data
-//             dispatch(setAuthUserData(userId, email, login, isAuth))
-//         }
-//     });
-// }
+export const getAuthUserData = () => (dispatch) =>{
+    return authApi.me().then(response => {
+        const data = response.data;
+        console.log(data)
+        if(response.status == 200){
+            // success
+            let{fullName, phone, email, id} = data.data
+            dispatch(setAuthUserData(fullName, phone, email, id))
+        }
+    });
+}
 
 export const login = ( email, password)=> async(dispatch)=>{
     let response = await authApi.login( email, password);
-    console.log(response)
-        const data = response.data;
+        const data = response.data.account;
         if(response.status == 200){
-            let{fullName} = data
-            dispatch(setAuthUserData(fullName));
-            let user = await authApi.getAcc();
-            console.log(user)
-            
+            let{fullName, phone, email, id} = data
+            dispatch(setAuthUserData(fullName, phone, email, id));
         } else{
             dispatch(setAuthUserData('something went wrong'))
         }
+}
+
+export const register = (fullName ,email, password, phone)=> async(dispatch)=>{
+    let response = await authApi.register(fullName ,email, password, phone);
+    const data = response.data.account;
+    if(response.status == 200){
+        let{fullName, phone, email, id} = data
+        dispatch(setAuthUserData(fullName, phone, email, id));
+    } else{
+        dispatch(setAuthUserData('something went wrong'))
+    }
 }
 
 export const logout = ()=> async(dispatch)=>{

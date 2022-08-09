@@ -3,7 +3,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import * as yup from 'yup';
-import { login } from './Redux/auth-reducer';
+import { register } from './Redux/auth-reducer';
 
 class LoginForm extends React.Component {
     constructor(props){
@@ -24,7 +24,7 @@ class LoginForm extends React.Component {
 
     validationSchema = yup.object().shape({
         password: yup.string().typeError('should be a string')
-            .max(35, 'max 8 characters').min(8, 'min 2 characters').required('required'),
+            .max(35, 'max 35 characters').min(8, 'min 8 characters').required('required'),
         email: yup.string().email('Email should be correct').required('required'),
     });
 
@@ -38,19 +38,31 @@ class LoginForm extends React.Component {
 
                 <Formik
                     initialValues={{
+                        fullName: '',
                         password: '',
-                        email: ''
+                        email: '',
+                        phone: ''
                     }}
                     validate={this.validateLoginForm}
                     validateOnBlur
                     onSubmit={(values) => {
                         if (values.email == ""|| values.password == "") { return }
-                        else { this.props.login( values.email, values.password) }
+                        else { this.props.register(values.fullName, values.email, values.password, values.phone) }
                     }}
                     validationSchema={this.validationSchema}
                 >
                     {(formik) => {
                         return <div>
+                            <p>
+                                <Field type="text"
+                                    name={'fullName'}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.fullName}
+                                    placeholder='Full Name'
+
+                                />
+                            </p>
                             <p>
                                 <Field type="email"
                                     name={'email'}
@@ -73,10 +85,21 @@ class LoginForm extends React.Component {
                                 />
                             </p>
                             {/* {formik.touched.password && formik.errors.password && <p>{formik.errors.password}</p>} */}
+                            <p>
+                                <Field type='phone'
+                                    name={'phone'}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.phone}
+                                    placeholder='phone number'
+
+                                />
+                            </p>
                             <Field 
                                 type="button"
                                 onClick={this.setVisiblePassword}
                                 value="show password"/>
+                            {this.props.fullName == 'something went wrong' && <div><h4>Common error</h4></div>}
                             {console.log(formik.errors)}
                             <Field 
                                 type="button"
@@ -97,6 +120,7 @@ const mapStateToProps = (state) => {
         isAuth: state.auth.isAuth,
         userId: state.auth.userId
     }
+
 }
 
-export default connect(mapStateToProps, { login })(LoginForm)
+export default connect(mapStateToProps, { register })(LoginForm)
