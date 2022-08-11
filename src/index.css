@@ -76,3 +76,58 @@ ul{
   background-color: #F1F1F3;
   height: 75px;
 }
+
+
+
+.custom-select-container {
+  display: inline-block;
+  min-width: 250px;
+  text-align: center;
+  position: relative;
+}
+
+.selected-text {
+  background-color: #47eded;
+  padding: 6px 20px;
+  border-bottom: 1px solid #37b0b0;
+}
+
+.selected-text::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  top: 16px;
+  border: 7px solid transparent;
+  border-color: #fff transparent transparent transparent;
+}
+
+.selected-text.active::after {
+  top: 8px;
+  border-color: transparent transparent #fff transparent;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.select-options {
+  position: absolute;
+  width: 100%;
+  z-index: 100;
+}
+
+.custom-select-option{
+  list-style-type: none;
+  padding: 6px 20px;
+  background: #47eded;
+  border-bottom: 1px solid #37b0b0;
+  cursor: pointer;
+}
+
+
+.custom-select-option:hover {
+  background-color: #32a6a6;
+  color: #ffffff;
+}

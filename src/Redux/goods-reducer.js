@@ -75,6 +75,7 @@ export const searchTextAC=(text)=>({type: SEARCH_TEXT, text})
 
 export const getGoods=(sort)=>async(dispatch)=>{
     const responce = await SearchApi.startProducts(sort);
+    console.log(responce)
     dispatch(setGoods(responce.data))
 }
 
@@ -95,7 +96,6 @@ export const getFavoriteGoods=()=>async(dispatch)=>{
 
 export const getSearchedGoods=(text)=>async(dispatch)=>{
     const responce = await SearchApi.searchText(text);
-    console.log(responce)
     dispatch(searchedGoods(responce.data))
 }
 

@@ -25,12 +25,8 @@ class Main extends React.Component {
     }
 
     onSortingChange=(id)=>{
-        if(id==1){
-            this.props.setCurrentSort("latest")
-        }else{
-            this.props.setCurrentSort("popular")
+            this.props.setCurrentSort(id)
         }
-    }
 
     validationSchema = yup.object().shape({
         searchText: yup.string().typeError('should be a string')
@@ -54,8 +50,8 @@ class Main extends React.Component {
                     /></div>
                     <div className={s.sorting}><CustomSelect
                         defaultText="Sorting"
-                        optionsList={[{ id: 1, name: "latest" },
-                        { id: 2, name: "popular" }]}
+                        optionsList={[{ id: "latest", name: "Latest" },
+                        { id: "popular", name: "Popular" }]}
                         onClick={this.onSortingChange}
                     /></div>
                 </div>
