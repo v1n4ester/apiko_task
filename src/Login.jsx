@@ -4,6 +4,9 @@ import { connect } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import * as yup from 'yup';
 import { login } from './Redux/auth-reducer';
+import ReactDOM from "react-dom";
+import { modalHelper } from "./Components/utils/modal-helper";
+const modal = document.getElementById("modal-container");
 
 class LoginForm extends React.Component {
     constructor(props){
@@ -32,8 +35,11 @@ class LoginForm extends React.Component {
         if (this.props.isAuth) {
             return <Navigate to={"/main"} />
         }
-        return (
+        if (!this.props.isOpen) return null;
+        modalHelper(this.props.onClose, modal)
+        return ReactDOM.createPortal(
             <div>
+                <button className="close" onClick={this.props.onClose}>X</button>
                 <h1>Login</h1>
 
                 <Formik
@@ -77,7 +83,6 @@ class LoginForm extends React.Component {
                                 type="button"
                                 onClick={this.setVisiblePassword}
                                 value="show password"/>
-                            {console.log(formik.errors)}
                             <Field 
                                 type="button"
                                 disabled={!formik.isValid}
@@ -87,7 +92,8 @@ class LoginForm extends React.Component {
                     }
                     }
                 </Formik>
-            </div>
+            </div>,
+    modal
         )
     }
 }

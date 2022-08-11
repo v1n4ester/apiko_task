@@ -1,4 +1,4 @@
-import { authApi } from "../API";
+import { authApi, offerApi } from "../API";
 
 
 const SET_USER_DATA = 'auth/SET_USER_DATA';
@@ -37,6 +37,28 @@ const authReducer = (state = initialState, action) => {
 
 export const setAuthUserData = (fullName, phone, email, id) => ({ type: SET_USER_DATA, payload: { fullName, phone, email, id } })
 const setCountries = (country) => ({ type: SET_COUNTRIES, country })
+
+export const sendOffer = (products, values) => async (dispatch) => {
+    const goods = [];
+    products.forEach(el => {
+        const some = {}
+        some.id = el.id;
+        some.quantity = el.productCount
+        goods.push(some);
+    });
+    const responce = await offerApi.postOffer(goods, values);
+    console.log(responce)
+
+    // return offerApi.me().then(response => {
+    //     const data = response.data;
+    //     console.log(data)
+    //     if (response.status == 200) {
+    //         // success
+    //         let { fullName, phone, email, id } = data.data
+    //         dispatch(setAuthUserData(fullName, phone, email, id))
+    //     }
+    // });
+}
 
 export const getAuthUserData = () => (dispatch) => {
     return authApi.me().then(response => {

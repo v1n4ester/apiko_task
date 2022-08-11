@@ -1,6 +1,6 @@
 import React from "react";
 
-class CustomSelect extends React.Component {
+class CustomCountrySelect extends React.Component {
   constructor(props) {
     super(props);
 
@@ -57,7 +57,7 @@ class CustomSelect extends React.Component {
       defaultSelectText: e.target.getAttribute("data-name"),
       showOptionList: false
     });
-    this.props.onClick(e.target.getAttribute("id"))
+    this.props.onClick(e.target.getAttribute("data-name"))
   };
 
   render() {
@@ -77,10 +77,9 @@ class CustomSelect extends React.Component {
               return (
                 <li
                   className="custom-select-option"
-                  data-name={option.name}
-                  id={option.id}
-                  key={option.id}
+                  data-name={option}
                   onClick={this.handleOptionClick}
+                  key={option}
                 >
                   {option.name}
                 </li>
@@ -93,4 +92,4 @@ class CustomSelect extends React.Component {
   }
 }
 
-export default CustomSelect;
+export default CustomCountrySelect;

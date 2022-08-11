@@ -27,14 +27,14 @@ export const SearchApi={
     searchText(text){
         return axios.get(`api/products/search?keywords=${text}&limit=12`);
     },
-    startProducts(sortedBy){
-        return instance.get(`api/products?limit=12&sortBy=${sortedBy || "latest"}`);
+    startProducts(sortedBy, limit){
+        return instance.get(`api/products?limit=${limit}&sortBy=${sortedBy || "latest"}`);
     },
     getCategories(){
         return instance.get(`api/categories`);
     },
-    getChoosedCategory(id, sortedBy){
-        return instance.get(`api/categories/${id}/products?sortBy=${sortedBy || "latest"}`);
+    getChoosedCategory(id, sortedBy, limit){
+        return instance.get(`api/categories/${id}/products?limit=${limit}&sortBy=${sortedBy || "latest"}`);
     },
 }
 
@@ -50,5 +50,16 @@ export const authApi = {
     },
     logOut(){
         return instance.delete(`https://jsonplaceholder.typicode.com/users/11`)
+    },
+    getCountries(){
+        return instance.get(`api/locations/countries`)
     }
 } 
+
+export const offerApi={
+    postOffer(products, value){
+        console.log(products)
+        console.log(value)
+        return instance.post(`/api/orders`,{items: products, shipment: value})
+    }
+}

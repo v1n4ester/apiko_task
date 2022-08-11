@@ -5,6 +5,7 @@ import Likes from './Components/Likes';
 import Footer from './Components/Footer/Footer';
 import Login from './Login';
 import Register from './Register';
+import Cart from './Components/Cart';
 
 function App() {
   return (
@@ -15,8 +16,7 @@ function App() {
         <Route path="/" element={<Navigate to={"/main"} />} />
         <Route path="/main" element={<Main />}/>
         <Route path="/likes" element={<Likes />}/>
-        <Route path="/login" element={<Login />}/>
-        <Route path="/register" element={<Register />}/>
+        <Route path="/cart" element={<Cart />}/>
       </Routes>
       <Footer />
     </div>
