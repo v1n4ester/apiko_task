@@ -40,12 +40,6 @@ class Cart extends React.Component {
     componentDidMount = () => {
         this.startPage();
     }
-
-    // componentDidUpdate=(prevState, prevProps)=>{
-    //    console.log(this.props) 
-    //    console.log(prevState)
-    // }
-
     sendOffer = (goods, values) => {
         this.props.sendOffer(goods, values);
     }
@@ -68,22 +62,11 @@ class Cart extends React.Component {
     }
 
     hundlePlusMinusButton = (text, value) => {
-        debugger
         if (text === "minus") {
             this.setState({
                 itemsCount:  this.state.itemsCount + 1,
                 itemsCost: this.state.itemsCost - value
             })}
-            // this.state.itemsCount -= 1;
-            // this.state.itemsCost -= value
-        // } else {
-        //     this.setState({
-        //         itemsCount:  this.state.itemsCount + 1,
-        //         itemsCost: this.state.itemsCost + value
-        //     })
-            // this.state.itemsCount += 1;
-            // this.state.itemsCost += value
-        //}
     }
 
     validateFullName = values => {
@@ -112,8 +95,6 @@ class Cart extends React.Component {
         city: yup.string().typeError('Should be a string').required('Required'),
         address: yup.string().typeError('Should be a string').required('Required')
     });
-
-
 
     render() {
         if(this.props.loading){

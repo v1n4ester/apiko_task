@@ -1,6 +1,5 @@
 import { offerApi } from "../Components/API/API";
 import { setLoading } from "./app-reducer";
-import { setChoosedProduct } from "./goods-reducer";
 
 const OFFER_ERROR = "OFFER_ERROR"
 const SET_OFFERS = 'auth/SET_OFFERS';
@@ -55,7 +54,6 @@ export const sendOffer = (products, values) => async (dispatch) => {
         sessionStorage.removeItem('cart');
         dispatch(offersError(false))
         dispatch(setShowMessage(true))
-        dispatch(setChoosedProduct([]))
     } else {
         dispatch(offersError(true))
     }

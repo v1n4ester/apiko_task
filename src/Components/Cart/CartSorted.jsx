@@ -8,7 +8,6 @@ const CartSorted = (props) => {
     const [productCount, setProductCount] = useState(props.good.productCount || 1);
     const totalCost = productCount * props.good.price;
     const onButtonClick = (numb, type) => {
-        debugger
         setProductCount(numb)
         props.updateCountInCart(props.good, type)
         props.hundleClickButton(type, props.good.price)

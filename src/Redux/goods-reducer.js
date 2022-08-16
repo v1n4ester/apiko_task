@@ -10,13 +10,11 @@ const LIKE = 'LIKE'
 const DISLIKE = 'DISLIKE';
 const SET_CATEGORIES = "SET_CATEGORIES";
 const SET_CURRENT_CATEGORY = "SET_CURRENT_CATEGORY"
-const SET_CHOOSED_PRODUCT = "SET_CHOOSED_PRODUCT"
 const GET_PRODUCTS_IN_CART = "GET_PRODUCTS_IN_CART"
 const SET_DISABLE_BUTTON = "SET_DISABLE_BUTTON"
 
 const initialState = {
     goods: [],
-    choosedProducts: [],
     searchText: '',
     searchedText: '',
     categories: [],
@@ -43,13 +41,6 @@ export const goodsReducer = (state = initialState, action) => {
                 ...state,
                 goods: action.goods,
             }
-
-        case SET_CHOOSED_PRODUCT:
-            return {
-                ...state,
-                choosedProducts: action.product
-            }
-
         case SEARCHED_GOODS: {
             return {
                 ...state,
@@ -100,7 +91,6 @@ const setGoods = (goods) => ({ type: GOODS, goods });
 const setDisabledButton = (active) => ({ type: SET_DISABLE_BUTTON, active })
 const setCategories = (category) => ({ type: SET_CATEGORIES, category });
 export const setCurrentSort = (sort) => ({ type: SET_CURRENT_CATEGORY, sort });
-export const setChoosedProduct = (product) => ({ type: SET_CHOOSED_PRODUCT, product });
 export const getProductsInCart = (product) => ({ type: GET_PRODUCTS_IN_CART, product });
 export const likeSuccess = (itemId) => ({ type: LIKE, itemId })
 export const dislikeSuccess = (itemId) => ({ type: DISLIKE, itemId })
@@ -155,7 +145,7 @@ export const setProductToCart = (product, count) => (dispatch) => {
     const data = JSON.parse(sessionStorage.getItem('cart'));
     const result = updateChoosedItemsArray(data, product, count);
     sessionStorage.setItem('cart', JSON.stringify(result))
-    dispatch(setChoosedProduct(result))
+    dispatch(getProductsInCart(result))
 }
 
 export const updateCountInCart = (product, type) => (dispatch) => {
@@ -163,7 +153,7 @@ export const updateCountInCart = (product, type) => (dispatch) => {
     sessionStorage.removeItem('cart');
     const result = updateCountItemsArray(data, product, type)
     sessionStorage.setItem('cart', JSON.stringify(result))
-    dispatch(setChoosedProduct(result))
+    dispatch(getProductsInCart(result))
 }
 
 export const removeProductFromCart = (product) => (dispatch) => {
