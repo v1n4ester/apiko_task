@@ -1,5 +1,6 @@
-import { ProductsApi, SearchApi } from "../API"
+import { ProductsApi, SearchApi } from "../Components/API/API"
 import { updateObjectInArray, updateChoosedItemsArray, updateCountItemsArray } from "../Components/utils/object-helpers"
+import { setLoading } from "./app-reducer"
 
 
 const GOODS = 'GOODS'
@@ -11,134 +12,153 @@ const SET_CATEGORIES = "SET_CATEGORIES";
 const SET_CURRENT_CATEGORY = "SET_CURRENT_CATEGORY"
 const SET_CHOOSED_PRODUCT = "SET_CHOOSED_PRODUCT"
 const GET_PRODUCTS_IN_CART = "GET_PRODUCTS_IN_CART"
+const SET_DISABLE_BUTTON = "SET_DISABLE_BUTTON"
 
-const initialState={
+const initialState = {
     goods: [],
     choosedProducts: [],
     searchText: '',
+    searchedText: '',
     categories: [],
     sortedBy: "",
     currentCategory: null,
     disabledButton: false,
 }
 
-export const goodsReducer=(state = initialState, action)=>{
-    switch(action.type) {
+export const goodsReducer = (state = initialState, action) => {
+    switch (action.type) {
         case LIKE:
             return {
                 ...state,
-                goods: updateObjectInArray(state.goods, action.itemId, 'id', {favorite: true})
+                goods: updateObjectInArray(state.goods, action.itemId, 'id', { favorite: true })
             }
         case DISLIKE:
             return {
                 ...state,
-                goods: updateObjectInArray(state.goods, action.itemId, 'id', {favorite: false})
+                goods: updateObjectInArray(state.goods, action.itemId, 'id', { favorite: false })
             }
 
         case GOODS:
-        return{
-            ...state,
-            goods: action.goods,
-            disabledButton: action.active
-        }
-
-        case SET_CHOOSED_PRODUCT:
-        return{
-            ...state,
-            choosedProducts: action.product
-        }
-
-        case SEARCHED_GOODS:{
-            return{
+            return {
                 ...state,
                 goods: action.goods,
+            }
+
+        case SET_CHOOSED_PRODUCT:
+            return {
+                ...state,
+                choosedProducts: action.product
+            }
+
+        case SEARCHED_GOODS: {
+            return {
+                ...state,
+                goods: action.goods,
+                searchedText: action.text,
                 searchText: ""
             }
         }
 
-        case SEARCH_TEXT:{
-            return{
+        case SEARCH_TEXT: {
+            return {
                 ...state,
                 searchText: action.text
             }
         }
 
-        case SET_CATEGORIES:{
-            return{
+        case SET_CATEGORIES: {
+            return {
                 ...state,
                 categories: action.category
             }
         }
-        case SET_CURRENT_CATEGORY:{
-            return{
+        case SET_CURRENT_CATEGORY: {
+            return {
                 ...state,
                 sortedBy: action.sort
             }
         }
-        case GET_PRODUCTS_IN_CART:{
-            return{
+        case GET_PRODUCTS_IN_CART: {
+            return {
                 ...state,
                 goods: action.product
             }
         }
-        default: 
+        case SET_DISABLE_BUTTON: {
+            return {
+                ...state,
+                disabledButton: action.active
+            }
+        }
+        default:
             return state
 
     }
 }
 
-const setGoods=(goods, active)=>({type: GOODS, goods, active});
-const setCategories=(category)=>({type: SET_CATEGORIES, category});
-export const setCurrentSort=(sort)=>({type: SET_CURRENT_CATEGORY, sort});
-const setChoosedProduct=(product)=>({type: SET_CHOOSED_PRODUCT, product});
-export const getProductsInCart=(product)=>({type: GET_PRODUCTS_IN_CART, product});
+const setGoods = (goods) => ({ type: GOODS, goods });
+const setDisabledButton = (active) => ({ type: SET_DISABLE_BUTTON, active })
+const setCategories = (category) => ({ type: SET_CATEGORIES, category });
+export const setCurrentSort = (sort) => ({ type: SET_CURRENT_CATEGORY, sort });
+export const setChoosedProduct = (product) => ({ type: SET_CHOOSED_PRODUCT, product });
+export const getProductsInCart = (product) => ({ type: GET_PRODUCTS_IN_CART, product });
 export const likeSuccess = (itemId) => ({ type: LIKE, itemId })
 export const dislikeSuccess = (itemId) => ({ type: DISLIKE, itemId })
-const searchedGoods=(goods)=>({type: SEARCHED_GOODS, goods})
-export const searchTextAC=(text)=>({type: SEARCH_TEXT, text})
+const searchedGoods = (goods, text) => ({ type: SEARCHED_GOODS, goods, text })
+export const searchTextAC = (text) => ({ type: SEARCH_TEXT, text })
 
-export const getGoods=(sort, limit)=>async(dispatch)=>{
+export const getGoods = (sort, limit) => async (dispatch) => {
+    dispatch(setLoading(true))
     const responce = await SearchApi.startProducts(sort, limit);
-    if(responce.data < limit){
-        dispatch(setGoods(responce.data, true))
-    }else{
-        dispatch(setGoods(responce.data, false))
+    dispatch(setGoods(responce.data))
+    if (responce.data.length < limit) {
+        dispatch(setDisabledButton(true))
     }
-    
+    dispatch(setLoading(false))
 }
 
-export const getCategories=()=>async(dispatch)=>{
+export const getCategories = () => async (dispatch) => {
+    dispatch(setLoading(true))
     const responce = await SearchApi.getCategories();
     dispatch(setCategories(responce.data))
+    dispatch(setLoading(false))
 }
 
-export const getChoosedCategoryProducts=(id, sort, limit)=>async(dispatch)=>{
+export const getChoosedCategoryProducts = (id, sort, limit) => async (dispatch) => {
+    dispatch(setLoading(true))
     const responce = await SearchApi.getChoosedCategory(id, sort, limit);
-    if(responce.data < limit){
-        dispatch(setGoods(responce.data, true))
-    }else{
-        dispatch(setGoods(responce.data, false))
+    dispatch(setGoods(responce.data, true))
+    if (responce.data.length < limit) {
+        dispatch(setDisabledButton(true))
     }
+    dispatch(setLoading(false))
 }
 
-export const getFavoriteGoods=()=>async(dispatch)=>{
+export const getFavoriteGoods = () => async (dispatch) => {
+    dispatch(setLoading(true))
     const responce = await ProductsApi.favoritsGoods();
     dispatch(setGoods(responce.data))
+    dispatch(setLoading(false))
 }
 
-export const getSearchedGoods=(text)=>async(dispatch)=>{
-    const responce = await SearchApi.searchText(text);
-    dispatch(searchedGoods(responce.data))
+export const getSearchedGoods = (text, limit) => async (dispatch) => {
+    dispatch(setLoading(true))
+    const responce = await SearchApi.searchText(text, limit);
+    dispatch(searchedGoods(responce.data, text))
+    if (responce.data.length < limit) {
+        dispatch(setDisabledButton(true))
+    }
+    dispatch(setLoading(false))
 }
 
-export const setProductToCart=(product, count)=>(dispatch)=>{
+export const setProductToCart = (product, count) => (dispatch) => {
     const data = JSON.parse(sessionStorage.getItem('cart'));
     const result = updateChoosedItemsArray(data, product, count);
     sessionStorage.setItem('cart', JSON.stringify(result))
     dispatch(setChoosedProduct(result))
 }
 
-export const updateCountInCart=(product, type)=>(dispatch)=>{
+export const updateCountInCart = (product, type) => (dispatch) => {
     const data = JSON.parse(sessionStorage.getItem('cart'));
     sessionStorage.removeItem('cart');
     const result = updateCountItemsArray(data, product, type)
@@ -146,26 +166,54 @@ export const updateCountInCart=(product, type)=>(dispatch)=>{
     dispatch(setChoosedProduct(result))
 }
 
-export const removeProductFromCart=(product)=>(dispatch)=>{
+export const removeProductFromCart = (product) => (dispatch) => {
     const data = JSON.parse(sessionStorage.getItem('cart'));
     sessionStorage.removeItem('cart');
-    const result = data.filter(el=> !el.title.includes(product.title))
+    const result = data.filter(el => !el.title.includes(product.title))
     sessionStorage.setItem('cart', JSON.stringify(result))
     dispatch(getProductsInCart(result))
 }
 
-const likeDislikeFlow = async(dispatch, itemId, apiMethod, actionCreator)=>{
-    // dispatch(toggleIsFollowingProgres(true, itemId));
+const likeDislikeFlow = async (dispatch, itemId, apiMethod, actionCreator) => {
+    dispatch(setLoading(true))
     let response = await apiMethod(itemId);
-    console.log(response)
-        dispatch(actionCreator(itemId));
-        // dispatch(toggleIsFollowingProgres(false, itemId));
+    dispatch(actionCreator(itemId));
+    dispatch(setLoading(false))
 }
 
-export const like = (itemId) => async(dispatch) => {
+export const like = (itemId) => async (dispatch) => {
     likeDislikeFlow(dispatch, itemId, ProductsApi.like, likeSuccess);
 }
 
-export const dislike = (itemId) => async(dispatch) => {
+export const dislike = (itemId) => async (dispatch) => {
     likeDislikeFlow(dispatch, itemId, ProductsApi.dislike.bind(ProductsApi), dislikeSuccess);
+}
+
+export const unauthorizedLike = (itemId) => (dispatch) => {
+    const data = JSON.parse(sessionStorage.getItem('likes'));
+    sessionStorage.removeItem('likes');
+    if (data) {
+        data.push(itemId);
+        sessionStorage.setItem('likes', JSON.stringify(data));
+    } else {
+        sessionStorage.setItem('likes', JSON.stringify([itemId]));
+    }
+    dispatch(likeSuccess(itemId))
+}
+
+export const unauthorizedDislike = (itemId) => (dispatch) => {
+    const data = JSON.parse(sessionStorage.getItem('likes'));
+    console.log(itemId)
+    sessionStorage.removeItem('likes')
+    const result = data.filter(el => (el != itemId))
+    sessionStorage.setItem('likes', JSON.stringify(result));
+    dispatch(dislikeSuccess(itemId))
+}
+
+export const setunaUthorizedlikes = () => (dispatch) => {
+    const data = JSON.parse(sessionStorage.getItem('likes'));
+    sessionStorage.removeItem('likes');
+    if (data && data.length > 0) {
+        ProductsApi.setFavoritsUnauthorizedGoods(data)
+    }
 }

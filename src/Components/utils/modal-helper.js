@@ -1,6 +1,6 @@
-export const modalHelper=(func, place)=>{
+export const modalHelper=(func)=>{
     document.addEventListener("mousedown", (e) => {
-    if (!place.contains(e.target)) {
+    if (e.target.className === "black-cover") {
     func()
     } 
 });

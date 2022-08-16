@@ -1,17 +1,23 @@
-import { authApi } from "../API";
+import { authApi } from "../Components/API/API";
+import { setLoading } from "./app-reducer";
+import { offersError } from "./offer-reducer";
 
 
 const SET_USER_DATA = 'auth/SET_USER_DATA';
 const SET_COUNTRIES = 'auth/SET_COUNTRIES';
+const INITIALIZED_SUCCESS = 'INITIALIZED_SUCCESS';
+const SUCCESS_CHANGE = 'SUCCESS_CHANGE';
 
 
 let initialState = {
+    initialized: true,
     id: null,
     email: null,
     isAuth: false,
     fullName: '',
     phone: '',
     countries: [],
+    successChange: false
 };
 
 const authReducer = (state = initialState, action) => {
@@ -21,12 +27,22 @@ const authReducer = (state = initialState, action) => {
             return {
                 ...state,
                 ...action.payload,
-                isAuth: true
             }
         case SET_COUNTRIES:
             return {
                 ...state,
                 countries: action.country
+            }
+        case INITIALIZED_SUCCESS:
+            return {
+                ...state,
+                initialized: action.value,
+            }
+
+            case SUCCESS_CHANGE:
+            return {
+                ...state,
+                successChange: action.success,
             }
 
         default:
@@ -34,56 +50,93 @@ const authReducer = (state = initialState, action) => {
     }
 }
 
+export const initializedSuccess = (value) => ({ type: INITIALIZED_SUCCESS, value });
+export const successChanged = (success) => ({ type: SUCCESS_CHANGE, success });
+export const setAuthUserData = (fullName, phone, email, id, isAuth) => ({ type: SET_USER_DATA, payload: { fullName, phone, email, id, isAuth } })
+const setCountries = (country) => ({ type: SET_COUNTRIES, country });
 
-export const setAuthUserData = (fullName, phone, email, id) => ({ type: SET_USER_DATA, payload: { fullName, phone, email, id } })
-const setCountries = (country) => ({ type: SET_COUNTRIES, country })
+export const initialiezeApp = () => (dispatch) => {
+    dispatch(getAuthUserData());
+    dispatch(initializedSuccess(false));
+}
 
 export const getAuthUserData = () => (dispatch) => {
-    return authApi.me().then(response => {
-        const data = response.data;
-        console.log(data)
-        if (response.status == 200) {
-            // success
-            let { fullName, phone, email, id } = data.data
-            dispatch(setAuthUserData(fullName, phone, email, id))
-        }
-    });
+    const data = JSON.parse(localStorage.getItem('account'))
+    if (data) {
+        // success
+        let { fullName, phone, email, id } = data.account
+        dispatch(setAuthUserData(fullName, phone, email, id, true))
+    }
 }
 
 export const login = (email, password) => async (dispatch) => {
+    dispatch(setLoading(true))
     let response = await authApi.login(email, password);
-    const data = response.data.account;
+    const data = response.data;
     if (response.status == 200) {
-        let { fullName, phone, email, id } = data
-        dispatch(setAuthUserData(fullName, phone, email, id));
+        localStorage.setItem('account', JSON.stringify(data))
+        let { fullName, phone, email, id } = data.account
+        dispatch(setAuthUserData(fullName, phone, email, id, true));
+        dispatch(offersError(false))
+        window.location.reload(false)
     } else {
-        dispatch(setAuthUserData('something went wrong'))
+        dispatch(offersError(true))
     }
+    dispatch(setLoading(false))
 }
 
 export const register = (fullName, email, password, phone) => async (dispatch) => {
+    dispatch(setLoading(true))
     let response = await authApi.register(fullName, email, password, phone);
     const data = response.data.account;
     if (response.status == 200) {
+        localStorage.setItem('account', JSON.stringify(data));
         let { fullName, phone, email, id } = data
-        dispatch(setAuthUserData(fullName, phone, email, id));
+        dispatch(setAuthUserData(fullName, phone, email, id, true));
+        dispatch(offersError(false))
+        window.location.reload(false)
     } else {
-        dispatch(setAuthUserData('something went wrong'))
+        dispatch(offersError(true))
     }
+    dispatch(setLoading(false))
 }
 
 export const logout = () => async (dispatch) => {
-    let response = await authApi.logOut()
-    if (response.status == 200) {
-        dispatch(setAuthUserData(null, null, null, false))
+    localStorage.removeItem('account');
+    sessionStorage.removeItem('cart')
+    dispatch(setAuthUserData(null, null, null, null, false));
+    window.location.reload(false)
+}
+
+export const setNewPassword = (old, newPas) => async(dispatch) => {
+    const responce = await authApi.changePassword(old, newPas);
+    if(responce.status == 200){
+        dispatch(successChanged(true))
+        dispatch(offersError(false))
+    }else{
+        dispatch(offersError(true))
     }
+
+}
+
+export const setNewUserData = (fullName, email, phone, country, city, address) => async(dispatch) => {
+    const responce = await authApi.changeUserData(fullName, email, phone, country, city, address);
+    if(responce.status == 200){
+        dispatch(successChanged(true))
+        dispatch(offersError(false))
+    }else{
+        dispatch(offersError(true))
+    }
+
 }
 
 export const getCountries = () => async (dispatch) => {
+    dispatch(setLoading(true))
     let response = await authApi.getCountries();
     if (response.status == 200) {
         dispatch(setCountries(response.data))
     }
+    dispatch(setLoading(false))
 }
 
 

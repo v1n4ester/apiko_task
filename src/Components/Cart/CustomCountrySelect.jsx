@@ -33,7 +33,7 @@ class CustomCountrySelect extends React.Component {
   handleClickOutside = e => {
     if (
       !e.target.classList.contains("custom-select-option") &&
-      !e.target.classList.contains("selected-text")
+      !e.target.classList.contains("selected__country-text")
     ) {
       this.setState({
         showOptionList: false
@@ -57,31 +57,32 @@ class CustomCountrySelect extends React.Component {
       defaultSelectText: e.target.getAttribute("data-name"),
       showOptionList: false
     });
-    this.props.onClick(e.target.getAttribute("data-name"))
+    this.props.onClick(e.target.getAttribute("data-name"));
   };
 
   render() {
     const { optionsList } = this.props;
     const { showOptionList, defaultSelectText } = this.state;
     return (
-      <div className="custom-select-container">
+      <div className="custom-select-container custom__country-container">
         <div
-          className={showOptionList ? "selected-text active" : "selected-text"}
+          className={showOptionList ? "selected__country-text active" : "selected__country-text"}
           onClick={this.handleListDisplay}
         >
-          {defaultSelectText}
+          {defaultSelectText === this.props.defaultText? <span className="country__firs-text">{defaultSelectText}</span> : defaultSelectText}
         </div>
         {showOptionList && (
-          <ul className="select-options">
+          <ul className="select-options select__country-options">
             {optionsList.map(option => {
               return (
                 <li
-                  className="custom-select-option"
+                  className="custom-select-option custom__country-select-option"
                   data-name={option}
                   onClick={this.handleOptionClick}
+                  id={option}
                   key={option}
                 >
-                  {option.name}
+                  {option}
                 </li>
               );
             })}

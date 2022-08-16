@@ -1,19 +1,22 @@
 import * as axios from 'axios';
-// const TOKEN= localStorage.getItem("access_token");
-const TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjkzMiwiaWF0IjoxNjU5NzIwNTExNzU5LCJzdWIiOiJBUElfQVVUSE9SSVpBVElPTl9UT0tFTiJ9.IFE2gc9zvDaayJHP40h9gYWx9stZ3HgPSnxVBoY5Ls8"
+
 const instance = axios.create({
     headers:{
     'accept': 'application/json',
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${TOKEN}`
+    'Authorization': `Bearer ${JSON.parse(localStorage.getItem("account"))? 
+    JSON.parse(localStorage.getItem("account")).token : ''}`
     }
     
-});
+})
 
 export const ProductsApi={
     favoritsGoods(){
-        return instance.get('api/products/favorites');
+       return instance.get('api/products/favorites');
     },
+    setFavoritsUnauthorizedGoods(ids){
+        return instance.post('api/products/favorites', {ids});
+     },
     like(itemId) {
         return instance.post(`api/products/${itemId}/favorite`)
     },
@@ -24,8 +27,8 @@ export const ProductsApi={
 }
 
 export const SearchApi={
-    searchText(text){
-        return axios.get(`api/products/search?keywords=${text}&limit=12`);
+    searchText(text, limit){
+        return axios.get(`api/products/search?keywords=${text}&limit=${limit}`);
     },
     startProducts(sortedBy, limit){
         return instance.get(`api/products?limit=${limit}&sortBy=${sortedBy || "latest"}`);
@@ -39,17 +42,17 @@ export const SearchApi={
 }
 
 export const authApi = {
-    me(){
-        return instance.get(`/api/account`)
+    changePassword(oldPassword, password){
+        return instance.put('/api/account/password',{oldPassword, password})
+    },
+    changeUserData(fullName, email, phone, country, city, address){
+        return instance.put('/api/account',{fullName, email, phone, country, city, address})
     },
     register(fullName, email, password, phone){
         return instance.post(`/api/auth/register`,{fullName, email, password, phone})
     },
     login(email, password){
         return instance.post(`/api/auth/login`,{ email, password})
-    },
-    logOut(){
-        return instance.delete(`https://jsonplaceholder.typicode.com/users/11`)
     },
     getCountries(){
         return instance.get(`api/locations/countries`)
@@ -58,8 +61,9 @@ export const authApi = {
 
 export const offerApi={
     postOffer(products, value){
-        console.log(products)
-        console.log(value)
         return instance.post(`/api/orders`,{items: products, shipment: value})
+    },
+    getOffers(){
+        return instance.get(`api/orders?offset=0&limit=20`)
     }
 }

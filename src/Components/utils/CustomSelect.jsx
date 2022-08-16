@@ -3,10 +3,6 @@ import React from "react";
 class CustomSelect extends React.Component {
   constructor(props) {
     super(props);
-
-    // @defaultSelectText => Show default text in select
-    // @showOptionList => Show / Hide List options
-    // @optionsList => List of options
     this.state = {
       defaultSelectText: "",
       showOptionList: false,
@@ -15,8 +11,6 @@ class CustomSelect extends React.Component {
   }
 
   componentDidMount() {
-    // Add Event Listner to handle the click that happens outside
-    // the Custom Select Container
     document.addEventListener("mousedown", this.handleClickOutside);
     this.setState({
       defaultSelectText: this.props.defaultText
@@ -24,12 +18,9 @@ class CustomSelect extends React.Component {
   }
 
   componentWillUnmount() {
-    // Remove the event listner on component unmounting
     document.removeEventListener("mousedown", this.handleClickOutside);
   }
 
-  // This method handles the click that happens outside the
-  // select text and list area
   handleClickOutside = e => {
     if (
       !e.target.classList.contains("custom-select-option") &&
@@ -41,7 +32,6 @@ class CustomSelect extends React.Component {
     }
   };
 
-  // This method handles the display of option list
   handleListDisplay = () => {
     this.setState(prevState => {
       return {
@@ -50,8 +40,6 @@ class CustomSelect extends React.Component {
     });
   };
 
-  // This method handles the setting of name in select text area
-  // and list display on selection
   handleOptionClick = e => {
     this.setState({
       defaultSelectText: e.target.getAttribute("data-name"),
@@ -64,7 +52,7 @@ class CustomSelect extends React.Component {
     const { optionsList } = this.props;
     const { showOptionList, defaultSelectText } = this.state;
     return (
-      <div className="custom-select-container">
+      <div className={this.props.defaultText === "Sorting" ? "custom-select-container custom-sorting" : 'custom-select-container custom-categories'}>
         <div
           className={showOptionList ? "selected-text active" : "selected-text"}
           onClick={this.handleListDisplay}

@@ -31,7 +31,7 @@ export const updateChoosedItemsArray=(arr, action, count)=>{
 }
 
 export const updateCountItemsArray=(arr, product, type)=>{
-    const data = arr
+    const data = [...arr]
     if(type === "plus"){
         data.map(el=>{
             if(el.id === product.id){

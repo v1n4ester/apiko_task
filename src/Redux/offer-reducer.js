@@ -1,32 +1,35 @@
-import { authApi, offerApi } from "../API";
+import { offerApi } from "../Components/API/API";
+import { setLoading } from "./app-reducer";
+import { setChoosedProduct } from "./goods-reducer";
 
-
-const SET_USER_DATA = 'auth/SET_USER_DATA';
-const SET_COUNTRIES = 'auth/SET_COUNTRIES';
+const OFFER_ERROR = "OFFER_ERROR"
+const SET_OFFERS = 'auth/SET_OFFERS';
+const SHOW_MESSAGE = "SHOW_MESSAGE"
 
 
 let initialState = {
-    id: null,
-    email: null,
-    isAuth: false,
-    fullName: '',
-    phone: '',
-    countries: [],
+    offers: [],
+    offerError: false,
+    showMessage: false
 };
 
-const authReducer = (state = initialState, action) => {
+const offerReducer = (state = initialState, action) => {
     switch (action.type) {
 
-        case SET_USER_DATA:
+        case SET_OFFERS:
             return {
                 ...state,
-                ...action.payload,
-                isAuth: true
+                offers: action.offers
             }
-        case SET_COUNTRIES:
+        case OFFER_ERROR:
             return {
                 ...state,
-                countries: action.country
+                offerError: action.value
+            }
+        case SHOW_MESSAGE:
+            return {
+                ...state,
+                showMessage: action.value
             }
 
         default:
@@ -34,79 +37,37 @@ const authReducer = (state = initialState, action) => {
     }
 }
 
-
-export const setAuthUserData = (fullName, phone, email, id) => ({ type: SET_USER_DATA, payload: { fullName, phone, email, id } })
-const setCountries = (country) => ({ type: SET_COUNTRIES, country })
+const setOffers = (offers) => ({ type: SET_OFFERS, offers });
+export const offersError = (value) => ({ type: OFFER_ERROR, value });
+export const setShowMessage = (value) => ({ type: SHOW_MESSAGE, value })
 
 export const sendOffer = (products, values) => async (dispatch) => {
+    dispatch(setLoading(true))
     const goods = [];
     products.forEach(el => {
         const some = {}
-        some.id = el.id;
+        some.productId = el.id;
         some.quantity = el.productCount
         goods.push(some);
     });
     const responce = await offerApi.postOffer(goods, values);
-    console.log(responce)
-
-    // return offerApi.me().then(response => {
-    //     const data = response.data;
-    //     console.log(data)
-    //     if (response.status == 200) {
-    //         // success
-    //         let { fullName, phone, email, id } = data.data
-    //         dispatch(setAuthUserData(fullName, phone, email, id))
-    //     }
-    // });
-}
-
-export const getAuthUserData = () => (dispatch) => {
-    return authApi.me().then(response => {
-        const data = response.data;
-        console.log(data)
-        if (response.status == 200) {
-            // success
-            let { fullName, phone, email, id } = data.data
-            dispatch(setAuthUserData(fullName, phone, email, id))
-        }
-    });
-}
-
-export const login = (email, password) => async (dispatch) => {
-    let response = await authApi.login(email, password);
-    const data = response.data.account;
-    if (response.status == 200) {
-        let { fullName, phone, email, id } = data
-        dispatch(setAuthUserData(fullName, phone, email, id));
+    if (responce.status === 200) {
+        sessionStorage.removeItem('cart');
+        dispatch(offersError(false))
+        dispatch(setShowMessage(true))
+        dispatch(setChoosedProduct([]))
     } else {
-        dispatch(setAuthUserData('something went wrong'))
+        dispatch(offersError(true))
     }
+    dispatch(setLoading(false))
 }
 
-export const register = (fullName, email, password, phone) => async (dispatch) => {
-    let response = await authApi.register(fullName, email, password, phone);
-    const data = response.data.account;
-    if (response.status == 200) {
-        let { fullName, phone, email, id } = data
-        dispatch(setAuthUserData(fullName, phone, email, id));
-    } else {
-        dispatch(setAuthUserData('something went wrong'))
-    }
-}
-
-export const logout = () => async (dispatch) => {
-    let response = await authApi.logOut()
-    if (response.status == 200) {
-        dispatch(setAuthUserData(null, null, null, false))
-    }
-}
-
-export const getCountries = () => async (dispatch) => {
-    let response = await authApi.getCountries();
-    if (response.status == 200) {
-        dispatch(setCountries(response.data))
-    }
+export const getOffers = () => async (dispatch) => {
+    dispatch(setLoading(true))
+    const responce = await offerApi.getOffers();
+    dispatch(setOffers(responce.data))
+    dispatch(setLoading(false))
 }
 
 
-export default authReducer
+export default offerReducer
