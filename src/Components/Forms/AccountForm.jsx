@@ -37,7 +37,7 @@ class LoginForm extends React.Component {
     render() {
         if (this.props.successChange) {
             alert("success");
-            this, props.successChanged(false)
+            this.props.successChanged(false)
         }
         return <div className="account__form">
             <h1 className="account__form-title">Main information</h1>
