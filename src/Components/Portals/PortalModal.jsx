@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import close from '../../assets/main-images/close.svg'
+import { withNavigate } from "../Cart/Cart";
 import { modalHelper } from "../utils/modal-helper";
 const modal = document.getElementById("modal-container");
 
@@ -15,6 +16,13 @@ const PortalModal = (props) => {
         props.setProductToCart(product, productCount);
         setAddedToCart(true)
         props.onClose()
+    }
+
+    const buyNow=()=>{
+        props.setProductToCart(product, productCount);
+        setAddedToCart(true)
+        props.onClose()
+        return props.navigate('/cart')
     }
 
     const portalHelper = (place) => {
@@ -67,11 +75,11 @@ const PortalModal = (props) => {
                 </div>
                 <button className="good__modal-button_submit good__modal-button_cart" onClick={() => setProductToCart(product, productCount)}>ADD TO CART</button>
                 <button className={props.good.favorite ? "good__modal-button_submit good__modal-button_favorite" : "good__modal-button_submit"} onClick={() => props.good.favorite ? (props.dislike(props.good.id)) : (props.like(props.good.id))}>{props.good.favorite ? "ADDED TO FAVORITES" : 'ADD TO FAVORITES'}</button>
-                <button className="good__modal-button_submit good__modal-button_buy" >BUY NOW</button>
+                <button className="good__modal-button_submit good__modal-button_buy" onClick={buyNow}>BUY NOW</button>
             </div>
         </div>,
         modal
     );
 };
 
-export default PortalModal;
+export default withNavigate(PortalModal);

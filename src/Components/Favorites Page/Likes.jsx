@@ -1,10 +1,9 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import { Navigate } from 'react-router-dom';
-import { NavLink } from 'react-router-dom'
+import React from 'react';
+import { connect } from 'react-redux';
+import { Navigate, NavLink } from 'react-router-dom';
 import Preloader from '../../Preloader/Preloader';
-import { dislike, getFavoriteGoods, getGoods, getSearchedGoods, like, searchTextAC } from '../../Redux/goods-reducer'
-import Good from '../utils/Good'
+import { dislike, getFavoriteGoods, getGoods, getSearchedGoods, like, searchTextAC } from '../../Redux/goods-reducer';
+import Good from '../utils/Good';
 
 class Favorite extends React.Component {
     componentDidMount = () => {
@@ -26,7 +25,7 @@ class Favorite extends React.Component {
         } else {
             return <div className='no-items'>
                 <h4 className='no-items__text'>No items in this page yet</h4>
-                <NavLink className="no-items__link" onClick={() => window.location.reload(false)} to={"/main"}>Return to main page</NavLink>
+                <NavLink className="no-items__link" to={"/main"}>Return to main page</NavLink>
             </div>
         }
 
