@@ -15,9 +15,9 @@ import Preloader from './Preloader/Preloader';
 class App extends React.Component {
   componentDidMount() {
     this.props.initialiezeApp();
-    window.onunhandledrejection = (err) => {
-      alert("something gone wrong")
-    }
+    // window.onunhandledrejection = (err) => {
+    //   alert("something gone wrong")
+    // }
   }
   render() {
     if (this.props.initialized) {

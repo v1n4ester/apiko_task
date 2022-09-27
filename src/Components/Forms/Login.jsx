@@ -93,7 +93,7 @@ class LoginForm extends React.Component {
                                     <img className={this.state.visiblePassword ? "form-button_password-close" : "form-button_password"}
                                         onClick={this.setVisiblePassword} src={this.state.visiblePassword? password_close: password_open} />
                                 </p>
-                                {this.props.offerError && <span className="cart__form-error">Bad request</span>}
+                                {this.props.offerError && <span className="cart__form-error">Email or password incorrect</span>}
                                 <Field
                                     type="button"
                                     className="form__submit-button"

@@ -12,6 +12,7 @@ const SET_CATEGORIES = "SET_CATEGORIES";
 const SET_CURRENT_CATEGORY = "SET_CURRENT_CATEGORY"
 const GET_PRODUCTS_IN_CART = "GET_PRODUCTS_IN_CART"
 const SET_DISABLE_BUTTON = "SET_DISABLE_BUTTON"
+const SET_NEW_GOODS = "SET_NEW_GOODS"
 
 const initialState = {
     goods: [],
@@ -81,6 +82,12 @@ export const goodsReducer = (state = initialState, action) => {
                 disabledButton: action.active
             }
         }
+        case SET_NEW_GOODS: {
+            return {
+                ...state,
+                goods: [...state.goods, ...action.goods]
+            }
+        }
         default:
             return state
 
@@ -96,8 +103,9 @@ export const likeSuccess = (itemId) => ({ type: LIKE, itemId })
 export const dislikeSuccess = (itemId) => ({ type: DISLIKE, itemId })
 const searchedGoods = (goods, text) => ({ type: SEARCHED_GOODS, goods, text })
 export const searchTextAC = (text) => ({ type: SEARCH_TEXT, text })
+const setNewGoods = (goods) => ({ type: SET_NEW_GOODS, goods })
 
-export const getGoods = (sort, limit) => async (dispatch) => {
+export const getGoods = (sort, limit = 0) => async (dispatch) => {
     dispatch(setLoading(true))
     const responce = await SearchApi.startProducts(sort, limit);
     dispatch(setGoods(responce.data))
@@ -206,4 +214,14 @@ export const setunaUthorizedlikes = () => (dispatch) => {
     if (data && data.length > 0) {
         ProductsApi.setFavoritsUnauthorizedGoods(data)
     }
+}
+
+export const addNewGoods = (sort, limit) => async (dispatch) => {
+    dispatch(setLoading(true))
+    const responce = await SearchApi.startProducts(sort, limit);
+    dispatch(setNewGoods(responce.data))
+    if (responce.data.length < 12) {
+        dispatch(setDisabledButton(true))
+    }
+    dispatch(setLoading(false))
 }

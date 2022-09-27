@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import CustomSelect from '../utils/CustomSelect'
 import Preloader from '../../Preloader/Preloader'
 import { setLoading } from '../../Redux/app-reducer'
-import { dislike, getCategories, getChoosedCategoryProducts, getGoods, getSearchedGoods, like, searchTextAC, setCurrentSort, setProductToCart, unauthorizedLike, unauthorizedDislike, setunaUthorizedlikes } from '../../Redux/goods-reducer'
+import { dislike, getCategories, getChoosedCategoryProducts, getGoods, getSearchedGoods, like, searchTextAC, setCurrentSort, setProductToCart, unauthorizedLike, unauthorizedDislike, setunaUthorizedlikes, addNewGoods } from '../../Redux/goods-reducer'
 import Good from '../utils/Good'
 
 class Main extends React.Component {
@@ -12,23 +12,23 @@ class Main extends React.Component {
         this.state = {
             selectedCategory: 0,
             selectedType: "latest",
-            limit: 12,
+            limit: 0,
             hiddenSelector: "block",
         }
     }
     componentDidMount = () => {
         this.props.setunaUthorizedlikes()
-        this.props.getGoods(this.props.sortedBy, this.state.limit);
+        this.props.getGoods(this.props.sortedBy);
         this.props.getCategories();
     }
 
     hundleSelectorChange = (field) => (key) => {
-        if (this.state.limit != 12) {
-            this.state.limit = 12
+        if (this.state.limit != 0) {
+            this.state.limit = 0
         }
         this.setState({ [field]: key }, () => {
             if (this.state.selectedCategory === 0) {
-                this.props.getGoods(this.state.selectedType, this.state.limit)
+                this.props.getGoods(this.state.selectedType)
             } else {
                 this.props.getChoosedCategoryProducts(this.state.selectedCategory, this.state.selectedType, this.state.limit)
             }
@@ -38,7 +38,7 @@ class Main extends React.Component {
     hundleLoadMore = () => {
         this.state.limit += 12;
         if (this.state.selectedCategory === 0) {
-            this.props.getGoods(this.state.selectedType, this.state.limit)
+            this.props.addNewGoods(this.state.selectedType, this.state.limit)
         } else if (this.state.selectedCategory === "search") {
             this.props.getSearchedGoods(this.props.searchedText, this.state.limit)
         } else {
@@ -53,8 +53,8 @@ class Main extends React.Component {
     }
 
     onSubmit = (evt) => {
-        if (this.state.limit != 12) {
-            this.state.limit = 12
+        if (this.state.limit != 0) {
+            this.state.limit = 0
         }
         if (evt.key === 'Enter') {
             this.props.getSearchedGoods(this.props.serchText, this.state.limit);
@@ -135,6 +135,6 @@ const mapStateToProps = (state) => ({
 })
 
 export default connect(mapStateToProps, {
-    getGoods, searchTextAC, getSearchedGoods, like, dislike, getCategories, setLoading,
+    getGoods, searchTextAC, getSearchedGoods, like, dislike, getCategories, setLoading, addNewGoods,
     getChoosedCategoryProducts, setCurrentSort, setProductToCart, unauthorizedLike, unauthorizedDislike, setunaUthorizedlikes
 })(Main) 

@@ -31,7 +31,7 @@ export const SearchApi={
         return axios.get(`api/products/search?keywords=${text}&limit=${limit}`);
     },
     startProducts(sortedBy, limit){
-        return instance.get(`api/products?limit=${limit}&sortBy=${sortedBy || "latest"}`);
+        return instance.get(`api/products?limit=12&offset=${limit}&sortBy=${sortedBy || "latest"}`);
     },
     getCategories(){
         return instance.get(`api/categories`);

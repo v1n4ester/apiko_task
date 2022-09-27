@@ -7,6 +7,7 @@ import OffersContainer from './OffersContainer';
 import { setAccountButton } from '../../Redux/app-reducer';
 import { dislike, getCategories, getChoosedCategoryProducts, getGoods, getSearchedGoods, like, searchTextAC, setCurrentSort, setProductToCart } from '../../Redux/goods-reducer';
 import Preloader from '../../Preloader/Preloader';
+import { getFirstLetters } from '../utils/FirsLettersFunction';
 
 class Account extends React.Component {
     constructor(props) {
@@ -14,15 +15,15 @@ class Account extends React.Component {
         this.state = {
             selectedCategory: 0,
             selectedType: "latest",
-            limit: 12,
+            limit: 0,
             hiddenSelector: "block",
         }
 
     }
 
     hundleSelectorChange = (field) => (key) => {
-        if (this.state.limit != 12) {
-            this.state.limit = 12
+        if (this.state.limit != 0) {
+            this.state.limit = 0
         }
         this.setState({ [field]: key }, () => {
             if (this.state.selectedCategory === 0) {
@@ -80,10 +81,8 @@ class Account extends React.Component {
             return <Preloader/>
         }
         let name
-        let userName
         if (this.props.isAuth) {
-            userName = this.props.userName.split(' ')[0]
-            name = this.props.userName.match(/[A-Z]/g).join('')
+            name = getFirstLetters(this.props.userName)
         } else {
             return <Navigate to={"/main"} />
         }

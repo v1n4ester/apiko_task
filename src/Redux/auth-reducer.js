@@ -70,16 +70,18 @@ export const getAuthUserData = () => (dispatch) => {
 }
 
 export const login = (email, password) => async (dispatch) => {
+    const Email = email
     dispatch(setLoading(true))
-    let response = await authApi.login(email, password);
-    const data = response.data;
-    if (response.status == 200) {
+    try{
+        let response = await authApi.login(Email, password);
+        const data = response.data;
         localStorage.setItem('account', JSON.stringify(data))
         let { fullName, phone, email, id } = data.account
         dispatch(setAuthUserData(fullName, phone, email, id, true));
         dispatch(offersError(false))
         window.location.reload(false)
-    } else {
+    }
+    catch(error){
         dispatch(offersError(true))
     }
     dispatch(setLoading(false))
@@ -88,10 +90,10 @@ export const login = (email, password) => async (dispatch) => {
 export const register = (fullName, email, password, phone) => async (dispatch) => {
     dispatch(setLoading(true))
     let response = await authApi.register(fullName, email, password, phone);
-    const data = response.data.account;
+    const data = response.data;
     if (response.status == 200) {
-        localStorage.setItem('account', JSON.stringify(data));
-        let { fullName, phone, email, id } = data
+        localStorage.setItem('account', JSON.stringify(data))
+        let { fullName, phone, email, id } = data.account
         dispatch(setAuthUserData(fullName, phone, email, id, true));
         dispatch(offersError(false))
         window.location.reload(false)

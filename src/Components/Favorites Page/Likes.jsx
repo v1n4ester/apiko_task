@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Navigate, NavLink } from 'react-router-dom';
 import Preloader from '../../Preloader/Preloader';
-import { dislike, getFavoriteGoods, getGoods, getSearchedGoods, like, searchTextAC } from '../../Redux/goods-reducer';
+import { dislike, getFavoriteGoods, getSearchedGoods, like, searchTextAC } from '../../Redux/goods-reducer';
 import Good from '../utils/Good';
 
 class Favorite extends React.Component {
@@ -48,4 +48,4 @@ const mapStateToProps = (state) => ({
     loading: state.auth.loading
 })
 
-export default connect(mapStateToProps, { getGoods, searchTextAC, getSearchedGoods, like, dislike, getFavoriteGoods })(Favorite) 
+export default connect(mapStateToProps, { searchTextAC, getSearchedGoods, like, dislike, getFavoriteGoods })(Favorite) 

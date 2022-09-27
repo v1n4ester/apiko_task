@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { Field, Formik } from "formik";
 import { Navigate, useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux'
-import { getProductsInCart, removeProductFromCart, updateCountInCart, getGoods } from '../../Redux/goods-reducer';
+import { getProductsInCart, removeProductFromCart, updateCountInCart,} from '../../Redux/goods-reducer';
 import CartSorted from './CartSorted'
 import * as yup from 'yup'
 import { getCountries } from '../../Redux/auth-reducer';
@@ -250,4 +250,4 @@ const mapStateToProps = (state) => ({
     loading: state.auth.loading
 })
 
-export default compose(connect(mapStateToProps, { getProductsInCart, removeProductFromCart, updateCountInCart, getCountries, sendOffer, getGoods, setShowMessage }), withNavigate)(Cart) 
+export default compose(connect(mapStateToProps, { getProductsInCart, removeProductFromCart, updateCountInCart, getCountries, sendOffer, setShowMessage }), withNavigate)(Cart) 

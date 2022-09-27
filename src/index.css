@@ -112,6 +112,12 @@ q:after {
   content: none;
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 a {
   margin: 0;
   padding: 0;

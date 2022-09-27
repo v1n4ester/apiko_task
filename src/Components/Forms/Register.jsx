@@ -27,7 +27,7 @@ class LoginForm extends React.Component {
         .test('isValid',"invalid password", value=> /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]/.test(value)).required('required'),
         email: yup.string().email('Email should be correct').test('isValid',"invalid email", value=> /\S+@\S+/.test(value)).required('required'),
         fullName: yup.string().test('isValid',"invalid full name", value=> /^[a-zA-Z\s]+$/.test(value)).required('required'),
-        phone: yup.string().test('isValid',"invalid email", value=> /^(\+)?([0-9]){10,14}$/.test(value)).required('required'),
+        phone: yup.number().test('isValid',"invalid phone", value=> /^(\+)?([0-9]){10,14}$/.test(value)).required('required'),
     });
 
     render() {
@@ -81,7 +81,7 @@ class LoginForm extends React.Component {
                                     {formik.touched.email && formik.errors.email && <span className="cart__form-error">{formik.errors.email}</span>}
                                 </p>
                                 <p className="form__input-container">
-                                    <Field type='phone'
+                                    <Field type='number'
                                         className={formik.touched.phone && formik.errors.phone? "form-input cart__form-input-error": "form-input"}
                                         name={'phone'}
                                         onChange={formik.handleChange}

@@ -11,6 +11,7 @@ import { logout } from '../../Redux/auth-reducer'
 import RegisterForm from '../Forms/Register'
 import { withNavigate } from '../Cart/Cart'
 import LoginForm from '../Forms/Login'
+import { getFirstLetters } from '../utils/FirsLettersFunction'
 
 const Header = (props) => {
     useEffect(()=>{
@@ -41,7 +42,7 @@ const Header = (props) => {
     let name
     if (props.isAuth) {
         userName = props.userName.split(' ')[0]
-        name = props.userName.match(/[A-Z]/g).join('')
+        name = getFirstLetters(props.userName)
     }
     
     const [openLog, setOpenLog] = useState(false);
