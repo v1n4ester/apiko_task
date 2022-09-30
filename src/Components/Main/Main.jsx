@@ -1,17 +1,17 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import CustomSelect from '../utils/CustomSelect'
 import Preloader from '../../Preloader/Preloader'
 import { setLoading } from '../../Redux/app-reducer'
-import { dislike, getCategories, getChoosedCategoryProducts, getGoods, getSearchedGoods, like, searchTextAC, setCurrentSort, setProductToCart, unauthorizedLike, unauthorizedDislike, setunaUthorizedlikes, addNewGoods } from '../../Redux/goods-reducer'
+import { addNewGoods, dislike, getCategories, getChoosedCategoryProducts, getGoods, getSearchedGoods, like, searchTextAC, setCurrentSort, setProductToCart, setunaUthorizedlikes, unauthorizedDislike, unauthorizedLike } from '../../Redux/goods-reducer'
+import CustomSelect from '../utils/CustomSelect'
 import Good from '../utils/Good'
 
 class Main extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            selectedCategory: 0,
-            selectedType: "latest",
+            selectedCategory: "Choose category",
+            selectedType: "Sorting",
             limit: 0,
             hiddenSelector: "block",
         }
@@ -23,20 +23,34 @@ class Main extends React.Component {
     }
 
     hundleSelectorChange = (field) => (key) => {
+        let keys = key
         if (this.state.limit != 0) {
-            this.state.limit = 0
+            this.setState({ limit: 0 })
         }
-        this.setState({ [field]: key }, () => {
-            if (this.state.selectedCategory === 0) {
-                this.props.getGoods(this.state.selectedType)
-            } else {
-                this.props.getChoosedCategoryProducts(this.state.selectedCategory, this.state.selectedType, this.state.limit)
-            }
-        })
+        if (key !== "popular" && key !== "latest") {
+            keys = this.props.categories[+key - 1].name
+            this.setState({ [field]: keys }, () => {
+                if (this.state.selectedCategory === "Choose category") {
+                    this.props.getGoods(this.state.selectedType)
+                } else {
+                    this.props.getChoosedCategoryProducts(key, this.state.selectedType == "Sorting" ? "latest" : this.state.selectedType, this.state.limit)
+                }
+            })
+        } else {
+            this.setState({ [field]: keys }, () => {
+                if (this.state.selectedCategory === "Choose category") {
+                    this.props.getGoods(this.state.selectedType)
+                } else {
+                    const arr = this.props.categories.filter(el => el.name == this.state.selectedCategory)
+                    this.props.getChoosedCategoryProducts(arr[0].id, this.state.selectedType == "Sorting" ? "latest" : this.state.selectedType, this.state.limit)
+                }
+            })
+        }
+
     }
 
-    hundleLoadMore = () => {
-        this.state.limit += 12;
+    hundleLoadMore = async () => {
+        await this.setState({ limit: this.state.limit + 12 })
         if (this.state.selectedCategory === 0) {
             this.props.addNewGoods(this.state.selectedType, this.state.limit)
         } else if (this.state.selectedCategory === "search") {
@@ -49,24 +63,24 @@ class Main extends React.Component {
     onTextChange = (e) => {
         const text = e.target.value;
         this.props.searchTextAC(text)
-
     }
 
     onSubmit = (evt) => {
         if (this.state.limit != 0) {
-            this.state.limit = 0
+            this.setState({ limit: 0 })
         }
         if (evt.key === 'Enter') {
             this.props.getSearchedGoods(this.props.serchText, this.state.limit);
-            this.state.hiddenSelector = "none";
-            this.state.selectedCategory = 'search'
+            this.setState({
+                hiddenSelector: "none",
+                selectedCategory: "search"
+            })
         }
     }
 
     onSortingChange = (id) => {
         this.props.setCurrentSort(id)
     }
-
 
     render() {
         if (this.props.loading) {
@@ -88,7 +102,7 @@ class Main extends React.Component {
                     </div>
                     <div className={"main__categories"} style={{ display: this.state.hiddenSelector }}>
                         <CustomSelect
-                            defaultText="Choose category"
+                            defaultText={this.state.selectedCategory}
                             optionsList={this.props.categories}
                             sortedBy={this.props.sortedBy}
                             onClick={this.hundleSelectorChange("selectedCategory")}
@@ -96,7 +110,7 @@ class Main extends React.Component {
                     </div>
                     <div className={"main__sorting"} style={{ display: this.state.hiddenSelector }}>
                         <CustomSelect
-                            defaultText="Sorting"
+                            defaultText={this.state.selectedType}
                             optionsList={[{ id: "latest", name: "Latest" },
                             { id: "popular", name: "Popular" }]}
                             onClick={this.hundleSelectorChange("selectedType")}

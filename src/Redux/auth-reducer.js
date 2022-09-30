@@ -11,8 +11,11 @@ const SUCCESS_CHANGE = 'SUCCESS_CHANGE';
 
 let initialState = {
     initialized: true,
-    id: null,
-    email: null,
+    id: "",
+    email: "",
+    address: "",
+    city: "",
+    country: "",
     isAuth: false,
     fullName: '',
     phone: '',
@@ -39,7 +42,7 @@ const authReducer = (state = initialState, action) => {
                 initialized: action.value,
             }
 
-            case SUCCESS_CHANGE:
+        case SUCCESS_CHANGE:
             return {
                 ...state,
                 successChange: action.success,
@@ -52,7 +55,7 @@ const authReducer = (state = initialState, action) => {
 
 export const initializedSuccess = (value) => ({ type: INITIALIZED_SUCCESS, value });
 export const successChanged = (success) => ({ type: SUCCESS_CHANGE, success });
-export const setAuthUserData = (fullName, phone, email, id, isAuth) => ({ type: SET_USER_DATA, payload: { fullName, phone, email, id, isAuth } })
+export const setAuthUserData = (fullName, phone, email, id, address, city, country, isAuth) => ({ type: SET_USER_DATA, payload: { fullName, phone, email, id, address, city, country, isAuth } })
 const setCountries = (country) => ({ type: SET_COUNTRIES, country });
 
 export const initialiezeApp = () => (dispatch) => {
@@ -64,24 +67,24 @@ export const getAuthUserData = () => (dispatch) => {
     const data = JSON.parse(localStorage.getItem('account'))
     if (data) {
         // success
-        let { fullName, phone, email, id } = data.account
-        dispatch(setAuthUserData(fullName, phone, email, id, true))
+        let { fullName, phone, email, id, address, city, country } = data.account
+        dispatch(setAuthUserData(fullName, phone, email, id, address, city, country, true))
     }
 }
 
 export const login = (email, password) => async (dispatch) => {
     const Email = email
     dispatch(setLoading(true))
-    try{
+    try {
         let response = await authApi.login(Email, password);
         const data = response.data;
         localStorage.setItem('account', JSON.stringify(data))
-        let { fullName, phone, email, id } = data.account
-        dispatch(setAuthUserData(fullName, phone, email, id, true));
+        let { fullName, phone, email, id, address, city, country } = data.account
+        dispatch(setAuthUserData(fullName, phone, email, id, address, city, country, true));
         dispatch(offersError(false))
         window.location.reload(false)
     }
-    catch(error){
+    catch (error) {
         dispatch(offersError(true))
     }
     dispatch(setLoading(false))
@@ -93,8 +96,8 @@ export const register = (fullName, email, password, phone) => async (dispatch) =
     const data = response.data;
     if (response.status == 200) {
         localStorage.setItem('account', JSON.stringify(data))
-        let { fullName, phone, email, id } = data.account
-        dispatch(setAuthUserData(fullName, phone, email, id, true));
+        let { fullName, phone, email, id, address, city, country } = data.account
+        dispatch(setAuthUserData(fullName, phone, email, id, address, city, country, true));
         dispatch(offersError(false))
         window.location.reload(false)
     } else {
@@ -110,26 +113,32 @@ export const logout = () => async (dispatch) => {
     window.location.reload(false)
 }
 
-export const setNewPassword = (old, newPas) => async(dispatch) => {
+export const setNewPassword = (old, newPas) => async (dispatch) => {
     const responce = await authApi.changePassword(old, newPas);
-    if(responce.status == 200){
+    if (responce.status == 200) {
         dispatch(successChanged(true))
         dispatch(offersError(false))
-    }else{
+    } else {
         dispatch(offersError(true))
     }
 
 }
 
-export const setNewUserData = (fullName, email, phone, country, city, address) => async(dispatch) => {
+export const setNewUserData = (fullName, email, phone, country, city, address) => async (dispatch) => {
     const responce = await authApi.changeUserData(fullName, email, phone, country, city, address);
-    if(responce.status == 200){
+    const data = responce.data;
+    if (responce.status == 200) {
+        const accountData = JSON.parse(localStorage.getItem("account"));
+        const token = accountData.token;
+        localStorage.removeItem("account")
+        localStorage.setItem('account', JSON.stringify({ account: { ...data }, token }))
+        let { fullName, phone, email, id, address, city, country } = data
+        dispatch(setAuthUserData(fullName, phone, email, id, address, city, country, true));
         dispatch(successChanged(true))
         dispatch(offersError(false))
-    }else{
+    } else {
         dispatch(offersError(true))
     }
-
 }
 
 export const getCountries = () => async (dispatch) => {

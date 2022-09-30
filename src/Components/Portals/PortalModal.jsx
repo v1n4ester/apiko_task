@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import close from '../../assets/main-images/close.svg'
+import close from '../../assets/main-images/close.svg';
 import { withNavigate } from "../Cart/Cart";
 import { modalHelper } from "../utils/modal-helper";
 const modal = document.getElementById("modal-container");

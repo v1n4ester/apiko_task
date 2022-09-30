@@ -1,5 +1,5 @@
 import { ProductsApi, SearchApi } from "../Components/API/API"
-import { updateObjectInArray, updateChoosedItemsArray, updateCountItemsArray } from "../Components/utils/object-helpers"
+import { updateChoosedItemsArray, updateCountItemsArray, updateObjectInArray } from "../Components/utils/object-helpers"
 import { setLoading } from "./app-reducer"
 
 
@@ -16,6 +16,7 @@ const SET_NEW_GOODS = "SET_NEW_GOODS"
 
 const initialState = {
     goods: [],
+    cartGoods: [],
     searchText: '',
     searchedText: '',
     categories: [],
@@ -73,7 +74,7 @@ export const goodsReducer = (state = initialState, action) => {
         case GET_PRODUCTS_IN_CART: {
             return {
                 ...state,
-                goods: action.product
+                cartGoods: action.product
             }
         }
         case SET_DISABLE_BUTTON: {
@@ -109,7 +110,7 @@ export const getGoods = (sort, limit = 0) => async (dispatch) => {
     dispatch(setLoading(true))
     const responce = await SearchApi.startProducts(sort, limit);
     dispatch(setGoods(responce.data))
-    if (responce.data.length < limit) {
+    if (responce.data.length < 12) {
         dispatch(setDisabledButton(true))
     }
     dispatch(setLoading(false))
@@ -125,8 +126,13 @@ export const getCategories = () => async (dispatch) => {
 export const getChoosedCategoryProducts = (id, sort, limit) => async (dispatch) => {
     dispatch(setLoading(true))
     const responce = await SearchApi.getChoosedCategory(id, sort, limit);
-    dispatch(setGoods(responce.data, true))
-    if (responce.data.length < limit) {
+    if (limit != 0) {
+        dispatch(setNewGoods(responce.data))
+    } else {
+        dispatch(setGoods(responce.data, true))
+    }
+
+    if (responce.data.length < 12) {
         dispatch(setDisabledButton(true))
     }
     dispatch(setLoading(false))
@@ -143,7 +149,7 @@ export const getSearchedGoods = (text, limit) => async (dispatch) => {
     dispatch(setLoading(true))
     const responce = await SearchApi.searchText(text, limit);
     dispatch(searchedGoods(responce.data, text))
-    if (responce.data.length < limit) {
+    if (responce.data.length < 12) {
         dispatch(setDisabledButton(true))
     }
     dispatch(setLoading(false))
@@ -179,11 +185,11 @@ const likeDislikeFlow = async (dispatch, itemId, apiMethod, actionCreator) => {
     dispatch(setLoading(false))
 }
 
-export const like = (itemId) => async (dispatch) => {
+export const like = (itemId) => (dispatch) => {
     likeDislikeFlow(dispatch, itemId, ProductsApi.like, likeSuccess);
 }
 
-export const dislike = (itemId) => async (dispatch) => {
+export const dislike = (itemId) => (dispatch) => {
     likeDislikeFlow(dispatch, itemId, ProductsApi.dislike.bind(ProductsApi), dislikeSuccess);
 }
 
@@ -208,7 +214,7 @@ export const unauthorizedDislike = (itemId) => (dispatch) => {
     dispatch(dislikeSuccess(itemId))
 }
 
-export const setunaUthorizedlikes = () => (dispatch) => {
+export const setunaUthorizedlikes = () => () => {
     const data = JSON.parse(sessionStorage.getItem('likes'));
     sessionStorage.removeItem('likes');
     if (data && data.length > 0) {

@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { Field, Formik } from "formik";
 import { Navigate, useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux'
-import { getProductsInCart, removeProductFromCart, updateCountInCart,} from '../../Redux/goods-reducer';
+import { getProductsInCart, removeProductFromCart, updateCountInCart, } from '../../Redux/goods-reducer';
 import CartSorted from './CartSorted'
 import * as yup from 'yup'
 import { getCountries } from '../../Redux/auth-reducer';
@@ -12,6 +12,7 @@ import { sendOffer, setShowMessage } from '../../Redux/offer-reducer';
 import { compose } from 'redux';
 import CartMessage from '../Portals/CartMessage';
 import Preloader from '../../Preloader/Preloader';
+import { setAccountButton } from '../../Redux/app-reducer';
 
 export function withNavigate(Children) {
     return (props) => {
@@ -22,14 +23,6 @@ export function withNavigate(Children) {
 
 
 class Cart extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            itemsCount: 0,
-            itemsCost: 0,
-        }
-
-    }
     startPage = () => {
         const products = JSON.parse(sessionStorage.getItem('cart'))
         if (this.props.isAuth) {
@@ -44,29 +37,20 @@ class Cart extends React.Component {
         this.props.sendOffer(goods, values);
     }
 
-    continueShopping=()=>{
+    continueShopping = () => {
         return this.props.navigate('/main')
     }
 
-    closeMessage=()=>{
+    closeMessage = () => {
         this.props.setShowMessage(false)
         return this.props.navigate('/main')
     }
 
-    setItemsCount = (value) => {
-        this.state.itemsCount = value
-    }
-
-    setItemsCost = (value) => {
-        this.state.itemsCost = value
-    }
-
     hundlePlusMinusButton = (text, value) => {
         if (text === "minus") {
-            this.setState({
-                itemsCount:  this.state.itemsCount + 1,
-                itemsCost: this.state.itemsCost - value
-            })}
+            this.itemsCount += 1
+            this.itemsCost -= value
+        }
     }
 
     validateFullName = values => {
@@ -97,8 +81,8 @@ class Cart extends React.Component {
     });
 
     render() {
-        if(this.props.loading){
-            return <Preloader/>
+        if (this.props.loading) {
+            return <Preloader />
         }
         if (!this.props.isAuth) {
             return <Navigate to={"/main"} />
@@ -108,12 +92,12 @@ class Cart extends React.Component {
         let itemsCost = 0
         if (this.props.goods) {
             goodsList = this.props.goods.map(g => <CartSorted key={g.id}
-                good={g} removeProductFromCart={this.props.removeProductFromCart} updateCountInCart={this.props.updateCountInCart} hundleClickButton={(text, value)=>this.hundlePlusMinusButton(text, value)} />)
+                good={g} removeProductFromCart={this.props.removeProductFromCart} updateCountInCart={this.props.updateCountInCart} hundleClickButton={(text, value) => this.hundlePlusMinusButton(text, value)} />)
             for (let i of this.props.goods) {
                 itemsCount += i.productCount
             }
             for (let i of this.props.goods) {
-                itemsCost += i.productCount * i.price
+                itemsCost += (i.productCount * i.price)
             }
         } else {
             return <div className='no-items'>
@@ -121,12 +105,12 @@ class Cart extends React.Component {
                 <NavLink className='no-items__link' to={"/main"}>Return to main page</NavLink>
             </div>
         }
-        this.state.itemsCount = itemsCount;
-        this.state.itemsCost = itemsCost;
         return (
             <div className={"cart"}>
                 {this.props.showMessage && <CartMessage isOpen={this.props.showMessage}
-                        onClose={this.closeMessage}/>}
+                    onClose={this.closeMessage}
+                    setAccountButton={this.props.setAccountButton}
+                    navigate={this.props.navigate} />}
                 <h2 className='cart__title'>My cart</h2>
                 <div className='cart__container'>
                     <div className='cart__goods'>
@@ -134,16 +118,16 @@ class Cart extends React.Component {
                     </div>
                     <Formik
                         initialValues={{
-                            fullName: '',
-                            phone: '',
-                            country: '',
-                            city: '',
-                            address: '',
+                            fullName: this.props.fullName,
+                            phone: this.props.phone,
+                            country: this.props.country,
+                            city: this.props.city,
+                            address: this.props.address,
 
                         }}
                         validateOnBlur
                         onSubmit={(values) => {
-                            if (Object.values(values).some(el=> el == "")) { return }
+                            if (Object.values(values).some(el => el == "")) { return }
                             else { this.sendOffer(this.props.goods, values) }
 
                         }}
@@ -155,7 +139,7 @@ class Cart extends React.Component {
                                     <Field type="text"
                                         id={'cart/fullName'}
                                         validate={this.validateFullName}
-                                        className={formik.touched.fullName && formik.errors.fullName? "cart__form-input cart__form-input-error": "cart__form-input"}
+                                        className={formik.touched.fullName && formik.errors.fullName ? "cart__form-input cart__form-input-error" : "cart__form-input"}
                                         name={'fullName'}
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
@@ -167,7 +151,7 @@ class Cart extends React.Component {
                                 <p className='cart__input-container'>
                                     <Field type="text"
                                         validate={this.validatePhone}
-                                        className={formik.touched.phone && formik.errors.phone? "cart__form-input cart__form-input-error": "cart__form-input"}
+                                        className={formik.touched.phone && formik.errors.phone ? "cart__form-input cart__form-input-error" : "cart__form-input"}
                                         name={'phone'}
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
@@ -179,7 +163,7 @@ class Cart extends React.Component {
                                 <div className='cart__form-wrapper'>
                                     <CustomCountrySelect
                                         name={'country'}
-                                        defaultText="Country"
+                                        defaultText={formik.values.country? formik.values.country : "Country"}
                                         optionsList={this.props.countries}
                                         onClick={(country) => formik.values.country = country}
                                     />
@@ -187,7 +171,7 @@ class Cart extends React.Component {
                                 </div>
                                 <p className={'cart__input-container'}>
                                     <Field type={"text"}
-                                        className={formik.touched.city && formik.errors.city? "cart__form-input cart__form-input-error": "cart__form-input"}
+                                        className={formik.touched.city && formik.errors.city ? "cart__form-input cart__form-input-error" : "cart__form-input"}
                                         name={'city'}
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
@@ -198,7 +182,7 @@ class Cart extends React.Component {
                                 </p>
                                 <p className='cart__input-container'>
                                     <Field type='text'
-                                        className={formik.touched.address && formik.errors.address? "cart__form-input cart__form-input-error": "cart__form-input"}
+                                        className={formik.touched.address && formik.errors.address ? "cart__form-input cart__form-input-error" : "cart__form-input"}
                                         name={'address'}
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
@@ -213,8 +197,8 @@ class Cart extends React.Component {
                                         <li className='cart__list-text_item'>Total</li>
                                     </ul>
                                     <ul className='cart__form-list_number'>
-                                        <li className='cart__list-number_item'>{this.state.itemsCount}</li>
-                                        <li className='cart__list-number_item'>$ {this.state.itemsCost}</li>
+                                        <li className='cart__list-number_item'>{itemsCount}</li>
+                                        <li className='cart__list-number_item'>$ {itemsCost}</li>
                                     </ul>
                                 </div>
                                 {this.props.offerError && <span className="cart__form-error">Request error</span>}
@@ -242,12 +226,18 @@ class Cart extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-    goods: state.main.goods,
+    goods: state.main.cartGoods,
     countries: state.auth.countries,
     isAuth: state.auth.isAuth,
+    fullName: state.auth.fullName,
+    email: state.auth.email,
+    phone: state.auth.phone,
+    country: state.auth.country,
+    city: state.auth.city,
+    address: state.auth.address,
     offerError: state.offer.offerError,
     showMessage: state.offer.showMessage,
     loading: state.auth.loading
 })
 
-export default compose(connect(mapStateToProps, { getProductsInCart, removeProductFromCart, updateCountInCart, getCountries, sendOffer, setShowMessage }), withNavigate)(Cart) 
+export default compose(connect(mapStateToProps, { getProductsInCart, removeProductFromCart, updateCountInCart, getCountries, sendOffer, setShowMessage, setAccountButton}), withNavigate)(Cart) 

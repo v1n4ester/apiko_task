@@ -1,5 +1,6 @@
 import { offerApi } from "../Components/API/API";
 import { setLoading } from "./app-reducer";
+import { getProductsInCart } from "./goods-reducer";
 
 const OFFER_ERROR = "OFFER_ERROR"
 const SET_OFFERS = 'auth/SET_OFFERS';
@@ -52,6 +53,7 @@ export const sendOffer = (products, values) => async (dispatch) => {
     const responce = await offerApi.postOffer(goods, values);
     if (responce.status === 200) {
         sessionStorage.removeItem('cart');
+        dispatch(getProductsInCart([]))
         dispatch(offersError(false))
         dispatch(setShowMessage(true))
     } else {

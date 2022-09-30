@@ -13,7 +13,7 @@ class CustomSelect extends React.Component {
   componentDidMount() {
     document.addEventListener("mousedown", this.handleClickOutside);
     this.setState({
-      defaultSelectText: this.props.defaultText
+      defaultSelectText: this.props.defaultText[0].toUpperCase() + this.props.defaultText.substring(1)
     });
   }
 

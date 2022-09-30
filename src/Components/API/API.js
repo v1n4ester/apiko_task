@@ -28,7 +28,7 @@ export const ProductsApi={
 
 export const SearchApi={
     searchText(text, limit){
-        return axios.get(`api/products/search?keywords=${text}&limit=${limit}`);
+        return axios.get(`api/products/search?keywords=${text}&limit=12&offset=${limit}`);
     },
     startProducts(sortedBy, limit){
         return instance.get(`api/products?limit=12&offset=${limit}&sortBy=${sortedBy || "latest"}`);
@@ -37,7 +37,7 @@ export const SearchApi={
         return instance.get(`api/categories`);
     },
     getChoosedCategory(id, sortedBy, limit){
-        return instance.get(`api/categories/${id}/products?limit=${limit}&sortBy=${sortedBy || "latest"}`);
+        return instance.get(`api/categories/${id}/products?limit=12&offset=${limit}&sortBy=${sortedBy || "latest"}`);
     },
 }
 

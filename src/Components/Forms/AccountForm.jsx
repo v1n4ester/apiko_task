@@ -2,21 +2,9 @@ import { Field, Formik } from "formik";
 import React from 'react';
 import { connect } from 'react-redux';
 import * as yup from 'yup';
-import { login, successChanged } from '../../Redux/auth-reducer';
+import { login, setNewPassword, setNewUserData, successChanged } from '../../Redux/auth-reducer';
 
-class LoginForm extends React.Component {
-    setVisiblePassword = () => (this.setState({ visiblePassword: !this.state.visiblePassword }))
-    validateLoginForm = values => {
-        const errors = {};
-        if (!values.password) {
-            return
-        } else if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]/.test(values.password)) {
-            errors.password = "invalid password"
-        }
-
-        return errors
-    };
-
+class AccountForm extends React.Component {
     validationSchema1 = yup.object().shape({
         email: yup.string().email('Email should be correct').test('isValid', "invalid email", value => /\S+@\S+/.test(value)).required('required'),
         fullName: yup.string().test('isValid', "invalid full name", value => /^[a-zA-Z\s]+$/.test(value)).required('required'),
@@ -28,9 +16,11 @@ class LoginForm extends React.Component {
 
     validationSchema2 = yup.object().shape({
         password: yup.string().typeError('should be a string')
-            .test('isValid', "invalid password", value => /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]/.test(value)).required('required'),
+            .test('isValid', "invalid password", value => /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]/.test(value))
+            .min(8, "minimum 8 characters").max(35, "maximum 35 characters").required('required'),
         newPassword: yup.string().typeError('should be a string')
-            .test('isValid', "invalid password", value => /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]/.test(value)).required('required'),
+            .test('isValid', "invalid password", value => /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]/.test(value))
+            .min(8, "minimum 8 characters").max(35, "maximum 35 characters").required('required'),
         confirmPassword: yup.string().oneOf([yup.ref('newPassword')], 'passwords are not same').required('required'),
     });
 
@@ -43,18 +33,17 @@ class LoginForm extends React.Component {
             <h1 className="account__form-title">Main information</h1>
             <Formik
                 initialValues={{
-                    fullName: '',
-                    email: '',
-                    phone: '',
-                    country: '',
-                    city: '',
-                    address: ''
+                    fullName: this.props.fullName,
+                    email: this.props.email,
+                    phone: this.props.phone,
+                    country: this.props.country,
+                    city: this.props.city,
+                    address: this.props.address
                 }}
-                validate={this.validateLoginForm}
                 validateOnBlur
                 onSubmit={(values) => {
                     if (values.email == "" || values.password == "") { return }
-                    else { this.props.login(values.email, values.password) }
+                    else { this.props.setNewUserData(values.fullName, values.email, values.phone, values.country, values.city, values.address) }
                 }}
                 validationSchema={this.validationSchema1}
             >
@@ -143,20 +132,19 @@ class LoginForm extends React.Component {
                     newPassword: '',
                     confirmPassword: ''
                 }}
-                validate={this.validateLoginForm}
                 validateOnBlur
                 onSubmit={(values) => {
-                    if (values.email == "" || values.password == "") { return }
-                    else { this.props.login(values.email, values.password) }
+                    if ( values.password == "") { return }
+                    else { this.props.setNewPassword(values.password, values.newPassword) }
                 }}
-                validationSchema={this.validationSchema}
+                validationSchema={this.validationSchema2}
             >
                 {(formik) => {
                     return <div className="account__form-container">
                         <p className="account__input-container">
                             <Field type="password"
                                 className={formik.touched.password && formik.errors.password ? "form-input cart__form-input-error" : "form-input"}
-                                name={'email'}
+                                name={'password'}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 value={formik.values.password}
@@ -203,9 +191,15 @@ class LoginForm extends React.Component {
 const mapStateToProps = (state) => {
     return {
         isAuth: state.auth.isAuth,
+        fullName: state.auth.fullName,
+        email: state.auth.email,
+        phone: state.auth.phone,
+        country: state.auth.country,
+        city: state.auth.city,
+        address: state.auth.address,
         userId: state.auth.userId,
         successChange: state.auth.successChange
     }
 }
 
-export default connect(mapStateToProps, { login, successChanged })(LoginForm)
+export default connect(mapStateToProps, { login, successChanged, setNewPassword, setNewUserData })(AccountForm)

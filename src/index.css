@@ -373,7 +373,30 @@ code {
   cursor: pointer;
 }
 
+.header__butttons_cart-container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.haeder__cart-counter {
+  position: absolute;
+  right: -6px;
+  top: -7px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #FD7114;
+  border: 1px solid #110F21;
+  color: #110F21;
+  font-size: 9px;
+  line-height: 13px;
+  letter-spacing: 0.4px;
+  text-align: center;
+}
+
 .header__buttons {
+  position: relative;
   display: flex;
   gap: 25px;
   align-items: center;
