@@ -6,7 +6,8 @@ class CustomSelect extends React.Component {
     this.state = {
       defaultSelectText: "",
       showOptionList: false,
-      optionsList: []
+      optionsList: [],
+      customTitle: this.props.title
     };
   }
 
@@ -52,7 +53,7 @@ class CustomSelect extends React.Component {
     const { optionsList } = this.props;
     const { showOptionList, defaultSelectText } = this.state;
     return (
-      <div className={this.props.defaultText === "Sorting" ? "custom-select-container custom-sorting" : 'custom-select-container custom-categories'}>
+      <div className={this.props.title === "Sorting" ? "custom-select-container custom-sorting" : 'custom-select-container custom-categories'}>
         <div
           className={showOptionList ? "selected-text active" : "selected-text"}
           onClick={this.handleListDisplay}

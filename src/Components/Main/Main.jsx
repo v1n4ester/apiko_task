@@ -23,21 +23,16 @@ class Main extends React.Component {
     }
 
     hundleSelectorChange = (field) => (key) => {
-        let keys = key
         if (this.state.limit != 0) {
             this.setState({ limit: 0 })
         }
         if (key !== "popular" && key !== "latest") {
-            keys = this.props.categories[+key - 1].name
-            this.setState({ [field]: keys }, () => {
-                if (this.state.selectedCategory === "Choose category") {
-                    this.props.getGoods(this.state.selectedType)
-                } else {
+            const name = this.props.categories[+key - 1].name
+            this.setState({ [field]: name }, () => {
                     this.props.getChoosedCategoryProducts(key, this.state.selectedType == "Sorting" ? "latest" : this.state.selectedType, this.state.limit)
-                }
             })
         } else {
-            this.setState({ [field]: keys }, () => {
+            this.setState({ [field]: key }, () => {
                 if (this.state.selectedCategory === "Choose category") {
                     this.props.getGoods(this.state.selectedType)
                 } else {
@@ -51,12 +46,13 @@ class Main extends React.Component {
 
     hundleLoadMore = async () => {
         await this.setState({ limit: this.state.limit + 12 })
-        if (this.state.selectedCategory === 0) {
+        if (this.state.selectedCategory === "Choose category") {
             this.props.addNewGoods(this.state.selectedType, this.state.limit)
         } else if (this.state.selectedCategory === "search") {
             this.props.getSearchedGoods(this.props.searchedText, this.state.limit)
         } else {
-            this.props.getChoosedCategoryProducts(this.state.selectedCategory, this.state.selectedType, this.state.limit)
+            const arr = this.props.categories.filter(el => el.name == this.state.selectedCategory)
+            this.props.getChoosedCategoryProducts(arr[0].id, this.state.selectedType == "Sorting" ? "latest" : this.state.selectedType, this.state.limit)
         }
     }
 
@@ -106,6 +102,7 @@ class Main extends React.Component {
                             optionsList={this.props.categories}
                             sortedBy={this.props.sortedBy}
                             onClick={this.hundleSelectorChange("selectedCategory")}
+                            title={"Category"}
                         />
                     </div>
                     <div className={"main__sorting"} style={{ display: this.state.hiddenSelector }}>
@@ -114,6 +111,7 @@ class Main extends React.Component {
                             optionsList={[{ id: "latest", name: "Latest" },
                             { id: "popular", name: "Popular" }]}
                             onClick={this.hundleSelectorChange("selectedType")}
+                            title={"Sorting"}
                         />
                     </div>
                 </div>
